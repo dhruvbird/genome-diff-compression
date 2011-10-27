@@ -41,20 +41,51 @@ researcher have done.\cite{6}
 
 \section*{Applicability}
 
+The goal of the 1000 genomes project\footnote{\url{http://www.1000genomes.org/}}
+is to find most genetic variants that have frequencies of at least 1\%
+in the populations studied. Similarly, once the \$1000 genome
+project\cite{1000genomeproject} becomes successful, storage costs for
+all the sequenced genomes will need to be kept under control. To be
+able to do this, we need an space (and time) efficient way of
+compressing the sequenced genomes so that the DNA of more people can
+be sequenced for a reasonable price.
+
+
 
 \section*{Current work}
 
 A group of researchers from The University of California at Irvine
-lead by Dr. Chen Li\footnote{http://www.ics.uci.edu/~chenli/} have
+lead by Dr. Chen Li\footnote{http://www.ics.uci.edu/\textasciitilde{}chenli/} have
 researched the compressibility of the human genome against a reference
-genome and have achieved fascinating results. They have been able to
+genome and have achieved fascinating results\cite{dnazip}. They have been able to
 compress James Watson's genome\footnote{James Watson's genome is a
   418MiB compressed downloadable tarball} which is 3 billion base
 pairs long to about 4MB of compressed data. This is small enough to be
-emailed across the globe!\cite{xyz}
+emailed across the globe!
 
+They have used the repititive nature of the genomic data to their
+advantage to aid compression. Also, since the genomes of most humans
+differs in approximately 1 base pair in about 1000, there are a lot of
+gains to be had by compressing a human genome it against a reference
+human genome.
 
-\subsection*{Handling FASTA files}
+Their technique relies on a few key
+observations\cite{genomecompressionchenli}:
+
+\begin{enumerate}
+
+\item \textbf{Variable integers for positions (VINT)}: Chromosome
+  sizes can vary. Some can be up to 250MiB in size. Representing
+  offsets within these files would require 4 bytes. However, many
+  smaller offsets don't need such large integers to store the
+  data. Variable size integers are helpful in such situations.
+
+\item \textbf{Delta positions (DELTA)}: The idea of storing delta
+  offsets v/s absolute offsets seems to be one borrowed from
+  run-length encoding of strings where repetitive patterns are stored
+  as offsets relative to where they last occured.
+
+\end{enumerate}
 
 \subsection*{}
 
@@ -62,12 +93,41 @@ emailed across the globe!\cite{xyz}
 
 \subsection*{Getting the data}
 
+We plan on using the same data that the previous research group from
+UC Irvine has used so that we can compare the compression achieved by
+our technique against theirs.
+
+The various data sets used by the researchers are:
+
+\begin{enumerate}
+
+\item The human reference genome\footnote{Compressed size is
+  840MiB}. This is used as the reference genome against which
+  differences are compared. There are 25 FASTA files, one for each
+  chromosome and the mitochondrial genome.
+
+\item dbSNP database, used as the refernece SNP\footnote{A
+  Single-nucleotide polymorphism is a DNA sequence variation occurring
+  when a single nucleotide - A, T, C or G - in the genome (or other
+  shared sequence) differs between members of a biological species or
+  paired chromosomes in an individual} map.
+
+
+\end{enumerate}
+
+
+\subsection*{Handling FASTA files}
+
+
 \subsection*{Rough estimates of compressibility}
+
+\clearpage
 
 \begin{thebibliography}{9}
 
-\bibitem{xyz}
-AbCd
+\bibitem{dnazip}
+DNAzip: DNA sequence compression using a reference genome
+\url{http://www.ics.uci.edu/~dnazip/}
 \bibitem{2}
 http://www.strategicgenomics.com/Genome/index.htm
 \bibitem{3}
@@ -78,6 +138,15 @@ http://en.wikipedia.org/wiki/Human\_genome
 http://www.1000genomes.org/about
 \bibitem{6}
 http://bioinformatics.oxfordjournals.org/content/25/2/274.full
+
+\bibitem{1000genomeproject}
+Anticipating the 1,000 dollar genome.
+Mardis ER
+
+\bibitem{genomecompressionchenli}
+Human genomes as email attachments.
+Scott Christley, Yiming Lu, Chen Li, \and Xiaohui Xie
+
 
 \end{thebibliography}
 
