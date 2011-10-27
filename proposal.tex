@@ -24,14 +24,14 @@ major input for most of the computation is the 2.9 billion base pairs
 
 Furthermore, reduction in the cost of sequencing(via the “next-gen” 
 sequencing platforms),has given birth to the 1000 genome project
-(1000genomes.org) which aims to sequence the genomes of a large 
+(\url{http://www.1000genomes.org/}) which aims to sequence the genomes of a large 
 number of people. Just like the other human genome reference projects,
 this data (estimated 8.2 billion bases per day) would be made
 available via public databases for the scientific community.\cite{5}
 
 As we can now see, we are dealing with megabytes and megabytes of data 
-when we do work with genomes! This has resulted in rise to challenging 
-problems with respect tostorage, distribution (downloading, copying), 
+when we work with genomes! This gives rise to challenging 
+problems with respect to storage, distribution (downloading, copying), 
 and sharing of this genomic data. Hence we need to consider better 
 compression techniques for the genomic data.
 
@@ -117,7 +117,16 @@ The various data sets used by the researchers are:
 
 
 \subsection*{Handling FASTA files}
+As mentioned in the above section, we have 25 FASTA files as 
+our input, sowe need to parse before we begin using them. 
+For this purpose, we are investigating the following FASTA tools :
+\begin{enumerate}
+\item FASTA/FASTQ Parser in C\cite{7}
+\item UVa FASTA Downloads\cite{8}
+\end{enumerate}
 
+We will be choosing the tools which would work well on our huge 
+DNA sequences with the least good memory footprint. 
 
 \subsection*{Rough estimates of compressibility}
 
@@ -138,6 +147,10 @@ http://en.wikipedia.org/wiki/Human\_genome
 http://www.1000genomes.org/about
 \bibitem{6}
 http://bioinformatics.oxfordjournals.org/content/25/2/274.full
+\bibitem{7}
+http://lh3lh3.users.sourceforge.net/parsefastq.shtml
+\bibitem{8}
+http://fasta.bioch.virginia.edu/fasta\_www2/fasta\_down.shtml
 
 \bibitem{1000genomeproject}
 Anticipating the 1,000 dollar genome.
