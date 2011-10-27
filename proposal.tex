@@ -1,7 +1,7 @@
 \documentclass[11pt,twocolumn]{article}
 
 \usepackage{hyperref}
-\usepackage{fullpage}
+% \usepackage{fullpage}
 
 \linespread{1.2}
 
@@ -91,6 +91,12 @@ observations\cite{genomecompressionchenli}:
 
 \section*{The plan}
 
+\subsection*{Understanding Prior Work}
+
+We need to refer to the papers and links in the \textit{References}
+section and understand the ideas presented therein so that we can
+potentially incorporate or improve upon them in our project.
+
 \subsection*{Getting the data}
 
 We plan on using the same data that the previous research group from
@@ -112,6 +118,8 @@ The various data sets used by the researchers are:
   shared sequence) differs between members of a biological species or
   paired chromosomes in an individual} map.
 
+\item James Watson's genome\footnote{Compressed size is 418MiB}, used
+  as the example genome to be compressed.
 
 \end{enumerate}
 
@@ -129,6 +137,25 @@ We will be choosing the tools which would work well on our huge
 DNA sequences with the least good memory footprint. 
 
 \subsection*{Rough estimates of compressibility}
+
+The human genome is about 3 billion base-pairs long. If each base is
+represented as a single (8-bit) ASCII character, then we need about
+3GB of storage space to store the human genome. However, since each
+base can hold one one of 4 bases, we can encode each base as a 2-bit
+word. This immediately reduces our storage requirement by 75\% and
+results in a 75\% compression, bringing down the storage to 750 MB.
+
+Simple gzip compression also achieves similar compressibility.
+
+The researchers were able to generate a \textit{diff} of size 84MB
+(uncompressed) of the human genome against the reference genome. This
+was further compressed down to about 4MB. This is a compression of
+about 95\%. Such compression may be hard to achieve if the specific
+constraints of the problem under consideration are not exploited.
+
+We think that we should be able to do better than 84MB while
+generating the difference between genomes and we plan to concentrate
+more of our energies there.
 
 \clearpage
 
