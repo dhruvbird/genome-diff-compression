@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <stack>
 #include <algorithm>
 
 using namespace std;
@@ -179,14 +180,12 @@ public:
     }
 
     void
-    lcp_pairwise(vi_t &lcp) {
+    lcp_pairwise(vi_t &pos, vi_t &lcp) {
         assert(this->dp.size() > 0);
         vi_t &_dp = this->dp.back();
 
         lcp.clear();
-        lcp.resize(this->ssize);
-
-        vi_t pos;
+        lcp.resize(this->ssize, 0);
         this->sorted_indexes(pos);
 
         if (this->ssize < 1) {
@@ -204,10 +203,14 @@ public:
                     y += (1 << j);
                 }
             }
-            lcp[i] = _lcp;
+            lcp[pos[i]] = _lcp;
             printf("LCP [%d, %d] == %d\n", pos[i], pos[i+1], _lcp);
         }
     }
+
+
+#define INDEX  first
+#define LENGTH second
 
     // Returns the lengths of longest common prefix of every string in
     // set-2 with some string in set-1.
@@ -217,7 +220,50 @@ public:
     // string where the string starting at index 'i' matches with
     // 'length' characters of match.
     void
-    lcp_across_sets(int set2_index, vpii_t &lcp) {
+    lcp_across_sets(int set2index, vpii_t &lcp) {
+        vi_t pos, plcp;
+        this->lcp_pairwise(pos, plcp);
+
+        lcp.clear();
+        lcp.resize(this->ssize, make_pair(0, 0));
+
+        std::stack<pii_t> set2pos;
+
+        for (size_t i = 0; i < this->ssize; ++i) {
+            if (pos[i] < set2index) {
+                int m = this->ssize + 1;
+                while (!set2pos.empty()) {
+                    pii_t t = set2pos.top();
+                    set2pos.pop();
+                    m = std::min(m, t.LENGTH);
+                    lcp[t.INDEX] = make_pair(pos[i], m);
+                }
+            }
+            else {
+                set2pos.push(make_pair(pos[i], plcp[pos[i]]));
+            }
+        }
+
+        while (!set2pos.empty()) {
+            set2pos.pop();
+        }
+
+        for (int i = this->ssize - 1; i >= 0; --i) {
+            if (pos[i] < set2index) {
+                int m = plcp[pos[i]];
+                while (!set2pos.empty()) {
+                    pii_t t = set2pos.top();
+                    set2pos.pop();
+                    if (m > lcp[t.INDEX].LENGTH) {
+                        lcp[t.INDEX] = make_pair(pos[i], m);
+                    }
+                    m = std::min(m, t.LENGTH);
+                }
+            }
+            else {
+                set2pos.push(make_pair(pos[i], plcp[pos[i]]));
+            }
+        }
     }
 
 };
@@ -241,8 +287,15 @@ namespace suffix_array {
         print_ranks("yabadabadoo", sa2.dp);
         print_suffix_array("yabadabadoo", sa2);
 
-        vi_t lcp;
-        sa2.lcp_pairwise(lcp);
+        vi_t pos, lcp;
+        // sa2.lcp_pairwise(pos, lcp);
+
+        vpii_t slcp;
+        sa2.lcp_across_sets(4, slcp);
+
+        for (int i = 0; i < slcp.size(); ++i) {
+            printf("slcp[%d] = (%d, %d)\n", i, slcp[i].INDEX, slcp[i].LENGTH);
+        }
 
         cout<<"log_2(11): "<<log2(11)<<endl;
         return 0;
