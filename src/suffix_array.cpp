@@ -269,36 +269,45 @@ public:
 };
 
 void
-print_suffix_array(std::string const &s, SuffixArray &sa) {
+print_suffix_array(std::string const &s, SuffixArray &sa, vi_t *plcp = NULL) {
     vi_t pos;
     sa.sorted_indexes(pos);
     for (size_t i = 0; i < pos.size(); ++i) {
-        printf("%3d: %s\n", pos[i], s.substr(pos[i]).c_str());
+        // Limit each line to 60 characters
+        if (plcp) {
+            printf("%3d: [%2d]: %s\n", pos[i], (*plcp)[pos[i]], s.substr(pos[i], 60).c_str());
+        }
+        else {
+            printf("%3d: %s\n", pos[i], s.substr(pos[i], 60).c_str());
+        }
     }
 }
 
+void
+print_pairwise_lcp(std::string const &s, SuffixArray &sa) {
+    vi_t pos, lcp;
+    sa.lcp_pairwise(pos, lcp);
+    print_suffix_array(s, sa, &lcp);
+}
 
 
 namespace suffix_array {
     int
     test() {
 
-        SuffixArray sa2("yabadabadoo");
-        print_ranks("yabadabadoo", sa2.dp);
-        print_suffix_array("yabadabadoo", sa2);
-
-        vi_t pos, lcp;
-        // sa2.lcp_pairwise(pos, lcp);
+        std::string s2 = "yabadabadoo";
+        SuffixArray sa2(s2);
+        print_ranks(s2, sa2.dp);
+        print_suffix_array(s2, sa2);
 
         vpii_t slcp;
         sa2.lcp_across_sets(4, slcp);
-
         for (int i = 0; i < slcp.size(); ++i) {
             printf("slcp[%d] = (%d, %d)\n", i, slcp[i].INDEX, slcp[i].LENGTH);
         }
 
-        cout<<"log_2(11): "<<log2(11)<<endl;
-        return 0;
+        print_pairwise_lcp(s2, sa2);
+        // return 0;
 
         SuffixArray sa1("banana");
         print_ranks("banana", sa1.dp);
@@ -309,6 +318,11 @@ namespace suffix_array {
         std::string s4 = "Regular expressions, or just regexes, are at the core of Perl's text processing, and certainly are one of the features that made Perl so popular. All Perl programmers pass through a stage where they try to program everything as regexes, and when that's not challenging enough, everything as a single regex. Perl's regexes have many more features than I can, or want, to present here, so I include those advanced features I find most useful and expect other Perl programmers to know about without referring to perlre, the documentation page for regexes.";
         SuffixArray sa4(s4);
         print_ranks(s4, sa4.dp);
+        print_suffix_array(s4, sa4);
+        
+        cout<<endl;
+        print_pairwise_lcp(s4, sa4);
+
     }
 }
 
