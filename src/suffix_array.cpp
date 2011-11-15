@@ -8,23 +8,10 @@
 #include <stack>
 #include <algorithm>
 
+#include <include/types.hpp>
+#include <include/utils.hpp>
+
 using namespace std;
-
-typedef pair<int, int> pii_t;
-typedef vector<char> vc_t;
-typedef vector<int>  vi_t;
-typedef vector<vi_t> vvi_t;
-typedef vector<pii_t> vpii_t;
-
-int log2(int n) {
-    int lg2 = 0;
-    while (n > 1) {
-        n /= 2;
-        ++lg2;
-    }
-    return lg2;
-}
-
 
 struct IndexesSorter {
     vi_t &cmp;
@@ -208,9 +195,6 @@ public:
         }
     }
 
-
-#define INDEX  first
-#define LENGTH second
 
     // Returns the lengths of longest common prefix of every string in
     // set-2 with some string in set-1.
