@@ -71,14 +71,14 @@ int main()
 	 // printf("%d",zero);
 	 binary_no(0,1);
 	 case_singlechar(base);
-	 printf("\n");
+	// printf("\n");
 	 break;
        }
        case 2:{
 	 //printf("case 2\n");
 	 binary_no(2,2);
 	 case_range(mystrings);	 
-	 printf("\n");
+	// printf("\n");
 	 break;
        }
      //CASE 3 : 11,236-256 
@@ -86,12 +86,13 @@ int main()
 	 //printf("case 3\n");
 	 binary_no(3,2);
 	 case_runofchar(mystrings);
-	 printf("\n");
+	// printf("\n");
 	 break;
        }
        }
      }
      fclose (pFile);
+     fclose (wFile);
    }
    return 0;
 }
