@@ -1,6 +1,10 @@
+#if !defined GC_FASTA_HPP
+#define GC_FASTA_HPP
+
 #include <stdio.h>
 #include <iostream>
 #include <string>
+#include <string.h>
 #include <assert.h>
 
 using namespace std;
@@ -10,7 +14,7 @@ class FastaReader {
     std::string fpath;
     char *buff;
     int bsz;
-    size_t sz = 0;
+    size_t sz;
 
     void
     readsome() {
@@ -27,7 +31,7 @@ class FastaReader {
 
 public:
     FastaReader(std::string path)
-        : pf(NULL), fpath(path), buff(NULL), bsz(0) {
+        : pf(NULL), fpath(path), buff(NULL), bsz(0), sz(0) {
         this->pf = fopen(path.c_str(), "r");
         assert(this->pf);
         ::getline(&this->buff, &this->sz, this->pf);
@@ -62,3 +66,12 @@ public:
 
 
 };
+
+namespace fasta {
+    int
+    test() {
+        return 0;
+    }
+}
+
+#endif // GC_FASTA_HPP

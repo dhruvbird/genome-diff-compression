@@ -117,8 +117,8 @@ namespace segtree {
 
     pii_t
     naive_query_min(vi_t const& v, int i, int j) {
-        uint_t mv = v[i];
-        uint_t mi = i;
+        int mv = v[i];
+        int mi = i;
         while (i <= j) {
             if (v[i] < mv) {
                 mv = v[i];

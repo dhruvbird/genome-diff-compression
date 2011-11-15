@@ -1,3 +1,6 @@
+#if !defined GC_SUFFIX_ARRAY_HPP
+#define GC_SUFFIX_ARRAY_HPP
+
 #include <stdio.h>
 #include <assert.h>
 
@@ -30,7 +33,7 @@ struct IndexesSorter {
 
 int
 get_rank(vi_t &cmp, int i) {
-    return i < cmp.size() ? cmp[i] : 0;
+    return i < (int)cmp.size() ? cmp[i] : 0;
 }
 
 struct SizeDoubler {
@@ -307,12 +310,8 @@ namespace suffix_array {
         cout<<endl;
         print_pairwise_lcp(s4, sa4);
 
+        return 0;
     }
 }
 
-#if defined TEST
-int
-main() {
-    return suffix_array::test();
-}
-#endif // TEST
+#endif // GC_SUFFIX_ARRAY_HPP
