@@ -64,7 +64,7 @@ struct SizeDoubler {
 void
 print_ranks(std::string const &s, vvi_t &dp) {
     int n = dp.empty() ? 0 : dp[0].size();
-    for (size_t r = 0; r < n; ++r) {
+    for (int r = 0; r < n; ++r) {
         printf("%3c", s[r]);
         for (size_t c = 0; c < dp.size(); ++c) {
             printf("%4d", dp[c][r]);
@@ -96,7 +96,7 @@ struct SuffixArray {
         int rank = 1;
         int prev = data[indexes[0]];
         for (size_t i = 0; i < n; ++i) {
-            cerr<<"data: "<<data[indexes[i]]<<", prev: "<<prev<<endl;
+            DPRINTF("data: %d, prev: %d\n", data[indexes[i]], prev);
             if (data[indexes[i]] != prev) {
                 ++rank;
                 prev = data[indexes[i]];
@@ -118,8 +118,8 @@ struct SuffixArray {
         for (size_t i = 0; i < n; ++i) {
             int r1 = data[indexes[i]];
             int r2 = get_rank(data, indexes[i]+sz);
-            printf("indexes[%d]: %d\n", i, indexes[i]);
-            printf("data: (%d, %d), prev: (%d, %d)\n", r1, r2, x, y);
+            DPRINTF("indexes[%d]: %d\n", i, indexes[i]);
+            DPRINTF("data: (%d, %d), prev: (%d, %d)\n", r1, r2, x, y);
             if (x != r1 || y != r2) {
                 ++rank;
                 x = r1; y = r2;
@@ -153,26 +153,21 @@ public:
         std::sort(indexes.begin(), indexes.end(), IndexesSorter(buf));
         this->make_ranks1(buf, indexes, this->dp[0]);
 
-        cerr<<"[1]\n";
+        DPRINTF("[1]\n");
 
-        // return;
-
-        for (int i = 1; i < this->dp.size(); ++i) {
-            cerr<<"i: "<<i<<endl;
+        for (size_t i = 1; i < this->dp.size(); ++i) {
             this->fill_indexes(indexes, n);
-            cerr<<"Done filling indexes\n";
+            DPRINTF("[%d] Done filling indexes\n", i);
             std::sort(indexes.begin(), indexes.end(), SizeDoubler(this->dp[i-1], 1 << (i-1)));
-            cerr<<"Done sorting\n";
+            DPRINTF("[%d] Done sorting\n", i);
             this->make_ranks2(this->dp[i-1], indexes, this->dp[i], 1 << (i-1));
-            cerr<<"Done making ranks\n";
-            // return;
+            DPRINTF("[%d] Done making ranks\n", i);
         }
     }
 
     void
     lcp_pairwise(vi_t &pos, vi_t &lcp) {
         assert(this->dp.size() > 0);
-        vi_t &_dp = this->dp.back();
 
         lcp.clear();
         lcp.resize(this->ssize, 0);
@@ -194,7 +189,7 @@ public:
                 }
             }
             lcp[pos[i]] = _lcp;
-            printf("LCP [%d, %d] == %d\n", pos[i], pos[i+1], _lcp);
+            DPRINTF("LCP [%d, %d] == %d\n", pos[i], pos[i+1], _lcp);
         }
     }
 
@@ -289,7 +284,7 @@ namespace suffix_array {
 
         vpii_t slcp;
         sa2.lcp_across_sets(4, slcp);
-        for (int i = 0; i < slcp.size(); ++i) {
+        for (size_t i = 0; i < slcp.size(); ++i) {
             printf("slcp[%d] = (%d, %d)\n", i, slcp[i].INDEX, slcp[i].LENGTH);
         }
 

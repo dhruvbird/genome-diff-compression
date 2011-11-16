@@ -11,6 +11,16 @@ typedef std::vector<int>  vi_t;
 typedef std::vector<vi_t> vvi_t;
 typedef std::vector<pii_t> vpii_t;
 
+struct Range {
+    int srci, desti, len;
+
+    Range(int si, int di, int l)
+        : srci(si), desti(di), len(l)
+    { }
+};
+
+typedef std::vector<Range> vr_t;
+
 #define INDEX  first
 #define LENGTH second
 
