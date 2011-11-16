@@ -19,14 +19,21 @@ class FastaReader {
     void
     readsome() {
         // Assume that buff is empty
+        if (feof(this->pf)) {
+            this->bsz = 0;
+            return;
+        }
+
         ssize_t ret = ::getline(&this->buff, &this->sz, this->pf);
         if (ret < 0) {
             this->bsz = 0;
+            return;
         }
+
         if (ret > 0 && this->buff[ret-1] == '\n') {
             --ret;
         }
-        bsz = ret;
+        this->bsz = ret;
     }
 
 public:
@@ -49,7 +56,7 @@ public:
                 }
             }
 
-            int m = this->bsz < size ? this->bsz : size;
+            int m = this->bsz < size ? this->bsz : tr;
             memmove(out, this->buff, m);
 
             int rem = this->bsz - m;
@@ -58,6 +65,7 @@ public:
             }
 
             this->bsz = rem;
+            out += m;
             tr -= m;
             ctr += m;
         }
@@ -70,6 +78,16 @@ public:
 namespace fasta {
     int
     test() {
+        return 0;
+        FastaReader fr("data/chr/chr1.fa");
+        char buff[1024];
+        int r = fr.read(buff, 50);
+
+        while (r) {
+            buff[r] = '\0';
+            printf("%s\n", buff);
+            r = fr.read(buff, 50);
+        }
         return 0;
     }
 }

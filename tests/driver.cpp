@@ -7,8 +7,8 @@ int
 main() {
     segtree::test();
     suffix_array::test();
-    fasta::test();
     algorithm::test();
+    fasta::test();
 
     return 0;
 }
