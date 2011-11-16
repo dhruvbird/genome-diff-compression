@@ -1,0 +1,104 @@
+\documentclass[11pt,twocolumn]{article}
+
+\usepackage{hyperref}
+% \usepackage{fullpage}
+
+\linespread{1.2}
+\setlength{\parskip}{1ex plus 0.5ex minus 0.2ex}
+
+\begin{document}
+
+\title{CSE 549\\Computational Biology -- Progress Report\\Genome Compression}
+\author{Pragya Pande \and Dhruv Matani}
+\date{\today}
+
+\maketitle
+
+\vspace{0.5in}
+
+\section*{Approach adopted}
+
+We started off with the following approach:
+\begin{enumerate}
+
+\item $Ref_i$ is our reference chromosome and $Victim_i$ is the
+  chromosome to be compressed
+
+\item For each chromosome pair $Ref_i$ and $Victim_i$, build a \textit{suffix
+  array}\footnote{This is done using Manber \& Myers $O(n\log{n})$
+  suffix array construction algorithm, which allows us to compute the
+  \textit{Longest common Prefix} of 2 adjacent suffixes in
+  $O(\log{n})$ time} from the string $Ref_i\#Victim_i\$$
+
+\item Find the longest substring for every string starting at every
+  index in $Victim_i$ that is present in $Ref_i$\footnote{This is
+    similar to the mid-term question}
+
+\item Now that we have all the ranges that the \textit{victim}
+  chromosome can be covered by, we find the least number of ranges
+  that can completely cover the \textit{victim}. This can be done in
+  $O(n\log{n})$ using \textit{Dynamic Programming} and \textit{Segment
+    Trees} as an online \textit{Range Minimum Query} data
+  structure. The problem of finding the minimal number of completely
+  covering sub-ranges exhibits optimal substructure. i.e. A solution
+  for the range $(i..n)$ can be constructed using the solution to the
+  ranges $(i+1..n), (i+2..n), (i+3..n), \ldots{}, (i+k-1..n)$, where
+  $k$ is the length of the range starting at index $i$.
+
+\end{enumerate}
+
+The total running time of our algorithm is $O(n\log{n})$, where $n$ is
+the length of the 2 concatenated chromosomes.
+
+After running our algorithm on 2 chromosomes, we found that the
+average length of an overlapping substring is about $10$ and not $250$
+as we had expected (since 2 human genomes are considered to differ in
+only about 1 of 1000 bases).
+
+The 2 chromosomes we used were from \textit{hg18}, which is
+\textit{build 36.1} on \textit{http://ncbi.nih.gov/} and \textit{build
+  36.3} on the same site.
+
+Any insight into why this is happening would be great since one of the
+assumptions that we were banking on has been falsified.
+
+In hind-sight, we think we could have saved some time by running some
+basic tests which ran a crude algorithm to find the average length of
+overlaps between genomes.
+
+\clearpage
+
+\begin{thebibliography}{9}
+
+\bibitem{dnazip}
+DNAzip: DNA sequence compression using a reference genome
+\url{http://www.ics.uci.edu/~dnazip/}
+\bibitem{2}
+http://www.strategicgenomics.com/Genome/index.htm
+\bibitem{3}
+http://www.nature.com/nature/journal/v431/n7011/abs/nature03001.html
+\bibitem{4}
+http://en.wikipedia.org/wiki/Human\_genome
+\bibitem{5}
+http://www.1000genomes.org/about
+\bibitem{6}
+http://bioinformatics.oxfordjournals.org/content/25/2/274.full
+\bibitem{7}
+http://lh3lh3.users.sourceforge.net/parsefastq.shtml
+\bibitem{8}
+http://fasta.bioch.virginia.edu/fasta\_www2/fasta\_down.shtml
+
+\bibitem{1000genomeproject}
+Anticipating the 1,000 dollar genome.
+Mardis ER
+
+\bibitem{genomecompressionchenli}
+Human genomes as email attachments.
+Scott Christley, Yiming Lu, Chen Li, \and Xiaohui Xie
+
+
+\end{thebibliography}
+
+
+
+\end{document}
