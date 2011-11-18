@@ -5,10 +5,10 @@
 
 int
 main() {
-    segtree::test();
+    // segtree::test();
     suffix_array::test();
-    algorithm::test();
-    fasta::test();
+    // algorithm::test();
+    // fasta::test();
 
     return 0;
 }

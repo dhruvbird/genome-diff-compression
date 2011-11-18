@@ -31,6 +31,51 @@ struct IndexesSorter {
 };
 
 
+/*
+void
+radix_sort(vi_t &dp, int sz, vi_t &ranks) {
+    const int n = dp[0].size();
+    vi_t c1(n+1, 0), c2(n+1, 0), indexes(n, 0);
+
+    for (int i = 0; i < n; ++i) {
+        indexes[i] = i;
+    }
+
+    for (int i = 0; i < n; ++i) {
+        int j = i + sz;
+        if (j < n) {
+            c1[indexes[dp[j]]]++;
+        }
+        else {
+            c1[0]++;
+        }
+    }
+
+    int sum = 0;
+    for (int i = 0; i < n; ++i) {
+        int t = c1[dp[i]];
+        sum += t;
+        c1[dp[i]] = sum;
+    }
+
+    for (int i = 0; i < n; ++i) {
+        int rank = c1[i] + c2[i]++;
+        indexes[i] = rank;
+    }
+
+    for (int i = 0; i < n; ++i) {
+        c1[dp[i]]++;
+    }
+
+    int sum = 0;
+    for (int i = 0; i < n; ++i) {
+        int t = c1[dp[i]];
+        sum += t;
+        c1[dp[i]] = sum;
+    }
+}
+*/
+
 int
 get_rank(vi_t &cmp, int i) {
     return i < (int)cmp.size() ? cmp[i] : 0;
@@ -61,40 +106,31 @@ struct SizeDoubler {
     }
 };
 
-void
-print_ranks(std::string const &s, vvi_t &dp) {
-    int n = dp.empty() ? 0 : dp[0].size();
-    for (int r = 0; r < n; ++r) {
-        printf("%3c", s[r]);
-        for (size_t c = 0; c < dp.size(); ++c) {
-            printf("%4d", dp[c][r]);
-        }
-        printf("\n");
-    }
-}
-
 struct SuffixArray {
     vvi_t dp;
+    vi_t dp_idx;
     size_t ssize;
 
     void
     fill_indexes(vi_t &indexes, size_t n) {
-        indexes.clear();
+        // indexes.clear();
         indexes.resize(n);
         for (size_t i = 0; i < n; ++i) {
             indexes[i] = i;
         }
     }
 
-    void
+    bool
     make_ranks1(vi_t &data, vi_t &indexes, vi_t &ranks) {
-        ranks.clear();
+        // ranks.clear();
         const size_t n = indexes.size();
         assert(n > 0);
 
         ranks.resize(n);
         int rank = 1;
         int prev = data[indexes[0]];
+        int max_rank = 1;
+
         for (size_t i = 0; i < n; ++i) {
             DPRINTF("data: %d, prev: %d\n", data[indexes[i]], prev);
             if (data[indexes[i]] != prev) {
@@ -102,19 +138,23 @@ struct SuffixArray {
                 prev = data[indexes[i]];
             }
             ranks[indexes[i]] = rank;
+            max_rank = std::max(max_rank, rank);
         }
+        return max_rank == n;
     }
 
-    void
+    bool
     make_ranks2(vi_t &data, vi_t &indexes, vi_t &ranks, int sz) {
-        ranks.clear();
+        // ranks.clear();
         const size_t n = indexes.size();
         assert(n > 0);
 
         ranks.resize(n);
         int rank = 1;
+        int max_rank = 1;
         int x = data[indexes[0]];
         int y = get_rank(data, indexes[0]+sz);
+
         for (size_t i = 0; i < n; ++i) {
             int r1 = data[indexes[i]];
             int r2 = get_rank(data, indexes[i]+sz);
@@ -125,13 +165,16 @@ struct SuffixArray {
                 x = r1; y = r2;
             }
             ranks[indexes[i]] = rank;
+            max_rank = std::max(max_rank, rank);
         }
+        fprintf(stderr, "max_rank: %d, n: %d\n", max_rank, n);
+        return max_rank == n;
     }
 
     void
     sorted_indexes(vi_t &pos) {
         assert(this->dp.size() > 0);
-        vi_t &_dp = this->dp.back();
+        vi_t &_dp = this->get_dp(this->dp.size() - 1);
         pos.clear();
         pos.resize(this->ssize);
         for (size_t i = 0; i < pos.size(); ++i) {
@@ -146,23 +189,35 @@ public:
             return;
         }
         const int n = this->ssize;
-        dp.resize(log2(n) + ((n & (n-1)) == n ? 1 : 2));
+        const int dp_sz = log2(n) + ((n & (n-1)) == n ? 1 : 2);
+        dp.resize(dp_sz);
+        dp_idx.resize(dp_sz, 0);
         vi_t buf(s.begin(), s.end());
         vi_t indexes;
         this->fill_indexes(indexes, n);
         std::sort(indexes.begin(), indexes.end(), IndexesSorter(buf));
-        this->make_ranks1(buf, indexes, this->dp[0]);
+        bool done = this->make_ranks1(buf, indexes, this->dp[0]);
 
         DPRINTF("[1]\n");
 
-        for (size_t i = 1; i < this->dp.size(); ++i) {
+        size_t i = 1;
+        for (; i < this->dp.size() && !done; ++i) {
             this->fill_indexes(indexes, n);
             DPRINTF("[%d] Done filling indexes\n", i);
             std::sort(indexes.begin(), indexes.end(), SizeDoubler(this->dp[i-1], 1 << (i-1)));
             DPRINTF("[%d] Done sorting\n", i);
-            this->make_ranks2(this->dp[i-1], indexes, this->dp[i], 1 << (i-1));
-            DPRINTF("[%d] Done making ranks\n", i);
+            done = this->make_ranks2(this->dp[i-1], indexes, this->dp[i], 1 << (i-1));
+            fprintf(stderr, "[%d] Done making ranks, done == %d\n", i, done);
+            this->dp_idx[i] = i;
         }
+        for (; i < dp.size(); ++i) {
+            dp_idx[i] = dp_idx[i-1];
+        }
+    }
+
+    vi_t&
+    get_dp(int i) {
+        return this->dp[this->dp_idx[i]];
     }
 
     void
@@ -181,8 +236,8 @@ public:
         for (size_t i = 0; i < this->ssize - 1; ++i) {
             int _lcp = 0, x = pos[i], y = pos[i+1];
             for (int j = this->dp.size() - 1; j >= 0 && x < n && y < n; --j) {
-                // printf("dp[%d][%d] == %d, dp[%d][%d] == %d\n", j, x, dp[j][x], j, y, dp[j][y]);
-                if (dp[j][x] == dp[j][y]) {
+                // printf("dp[%d][%d] == %d, dp[%d][%d] == %d\n", j, x, get_dp(j)[x], j, y, get_dp(j)[y]);
+                if (get_dp(j)[x] == get_dp(j)[y]) {
                     _lcp += (1 << j);
                     x += (1 << j);
                     y += (1 << j);
@@ -266,6 +321,19 @@ print_suffix_array(std::string const &s, SuffixArray &sa, vi_t *plcp = NULL) {
 }
 
 void
+print_ranks(std::string const &s, SuffixArray &sa) {
+    int n = sa.dp.empty() ? 0 : sa.dp[0].size();
+    for (int r = 0; r < n; ++r) {
+        printf("%3c", s[r]);
+        for (size_t c = 0; c < sa.dp.size(); ++c) {
+            printf("%4d", sa.get_dp(c)[r]);
+        }
+        printf("\n");
+    }
+}
+
+
+void
 print_pairwise_lcp(std::string const &s, SuffixArray &sa) {
     vi_t pos, lcp;
     sa.lcp_pairwise(pos, lcp);
@@ -279,7 +347,7 @@ namespace suffix_array {
 
         std::string s2 = "yabadabadoo";
         SuffixArray sa2(s2);
-        print_ranks(s2, sa2.dp);
+        print_ranks(s2, sa2);
         print_suffix_array(s2, sa2);
 
         vpii_t slcp;
@@ -292,14 +360,14 @@ namespace suffix_array {
         // return 0;
 
         SuffixArray sa1("banana");
-        print_ranks("banana", sa1.dp);
+        print_ranks("banana", sa1);
 
         SuffixArray sa3("mississippi");
-        print_ranks("mississippi", sa3.dp);
+        print_ranks("mississippi", sa3);
 
         std::string s4 = "Regular expressions, or just regexes, are at the core of Perl's text processing, and certainly are one of the features that made Perl so popular. All Perl programmers pass through a stage where they try to program everything as regexes, and when that's not challenging enough, everything as a single regex. Perl's regexes have many more features than I can, or want, to present here, so I include those advanced features I find most useful and expect other Perl programmers to know about without referring to perlre, the documentation page for regexes.";
         SuffixArray sa4(s4);
-        print_ranks(s4, sa4.dp);
+        print_ranks(s4, sa4);
         print_suffix_array(s4, sa4);
         
         cout<<endl;

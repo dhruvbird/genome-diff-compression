@@ -1,6 +1,7 @@
 \documentclass[11pt,twocolumn]{article}
 
 \usepackage{hyperref}
+\usepackage{graphicx}
 % \usepackage{fullpage}
 
 \linespread{1.2}
@@ -47,6 +48,14 @@ We started off with the following approach:
 
 \end{enumerate}
 
+\begin{figure}
+  \begin{center}
+    \includegraphics[height=3.4in]{figures/GenomeCompressionFlow.png}
+    \caption{The flow of Genome Compression}
+    \label{fig:genomecompressionflow}
+  \end{center}
+\end {figure}
+
 The total running time of our algorithm is $O(n\log{n})$, where $n$ is
 the length of the 2 concatenated chromosomes.
 
@@ -62,43 +71,110 @@ The 2 chromosomes we used were from \textit{hg18}, which is
 Any insight into why this is happening would be great since one of the
 assumptions that we were banking on has been falsified.
 
+When we compared a chromosome with itself, we got back a single range
+covering the entire genome. In another experiment, we compared a
+chromosome with itself, but with a few mutations, and we got back the
+correct expected small number of long ranges.
+
 In hind-sight, we think we could have saved some time by running some
 basic tests which ran a crude algorithm to find the average length of
 overlaps between genomes.
 
+We have also started work on an encoding scheme that efficiently packs
+range data into a tight binary representation. There are 3 types of
+cases that we wanted to handle:
+
+\begin{enumerate}
+
+\item \textit{Ranges:} A range specifies an $(offset, length)$ into
+  the reference chromosome that should be copied to the output to
+  reconstruct the victim chromosome. Each range looks like this:
+\begin{verbatim}
+6155526 170
+\end{verbatim}
+Which means that we should print $170$ characters from offset
+$6155526$ in the reference chromosome to the current output.
+
+\item \textit{Single character:} A single character is represented as
+  the character itself. e.g.
+\begin{verbatim}
+A
+\end{verbatim}
+
+\item \textit{Repeated character:} A repeated character is represented
+  by the character followed by the number of times it is
+  repeated. e.g.
+\begin{verbatim}
+C 33
+\end{verbatim}
+
+\end{enumerate}
+
+To represent these types of operations in binary, we represent a
+single character as a 4-bit entity, whose MSB\footnote{Most
+  Significant Bit is reset (0)}. The remaining 3 bits represent one of
+\textit{A, C, G, T, or N}.
+
+A character repeat is encoded in a 32-bit entity where the first 2
+bits are \textit{00}. The next 3 bits are the encoding of the
+character itself (similar to the single character encoding above). The
+remaining 27 bits hold the count of run.
+
+A range is represented by a 48-bit entity with the first 2 significant
+bits set to \textit{01}. The next 14 bits hold the length of the run
+and the last 32 bits hold the offset of this run in the reference
+chromosome.
+
+\section*{Shortcomings}
+
+The approach we have used doesn't seem to work since the average
+length of a run that matches some run in the reference chromosome is
+just 10 (v/s the 250 that we were expecting on average). This seems to
+go against our initial intuition of 2 human genomes being 99\% similar
+in their bases.
+
+We would like to talk to you about this.
+
+\section*{We we had planned}
+
+\begin{enumerate}
+
+\item Find reversals of a string in the reference genome
+
+\item Find complements of a string in the reference genome
+
+\item Find reverse complements of a string in the reference genome
+
+\item Convert ranges less than a certain threshold value $k$ to a
+  single character. For example, if we have a range of length 4, then
+  it would use up 48-bits on disk, whereas if we store them as single
+  characters, it would use $4*3 = 12$-bits on disk.
+
+\item If we have 3 ranges such that the center range has a length less
+  than a certain threshold $k$ and its length is the same as the
+  difference in the start and end offsets of the last and first ranges
+  respectively, then we can encode all three ranges as a single range
+  and add the substituted characters as specially encoded \textit{back
+    substitutions}.
+
+\end{enumerate}
+
+\section*{Plan-B}
+
+Plan-B involves directly using the SNP file containing the
+\textit{insertions, deletions, \& substitutions} needed to construct a
+chromosome with respect to the reference chromosome in the
+\textit{hg18} genome.
+
+After investigating the
+DNAZip\footnote{\textit{http://www.ics.uci.edu/~dnazip/index.html}}
+code, it seems that there is scope for reducing the size of the stored
+structures on disk by applying huffman encoding on some of the
+internal structures that are being written out to disk.
+
+We shall further investigate the scope of this Plan.
+
 \clearpage
-
-\begin{thebibliography}{9}
-
-\bibitem{dnazip}
-DNAzip: DNA sequence compression using a reference genome
-\url{http://www.ics.uci.edu/~dnazip/}
-\bibitem{2}
-http://www.strategicgenomics.com/Genome/index.htm
-\bibitem{3}
-http://www.nature.com/nature/journal/v431/n7011/abs/nature03001.html
-\bibitem{4}
-http://en.wikipedia.org/wiki/Human\_genome
-\bibitem{5}
-http://www.1000genomes.org/about
-\bibitem{6}
-http://bioinformatics.oxfordjournals.org/content/25/2/274.full
-\bibitem{7}
-http://lh3lh3.users.sourceforge.net/parsefastq.shtml
-\bibitem{8}
-http://fasta.bioch.virginia.edu/fasta\_www2/fasta\_down.shtml
-
-\bibitem{1000genomeproject}
-Anticipating the 1,000 dollar genome.
-Mardis ER
-
-\bibitem{genomecompressionchenli}
-Human genomes as email attachments.
-Scott Christley, Yiming Lu, Chen Li, \and Xiaohui Xie
-
-
-\end{thebibliography}
-
 
 
 \end{document}

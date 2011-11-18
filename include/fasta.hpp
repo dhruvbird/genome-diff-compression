@@ -30,6 +30,11 @@ class FastaReader {
             return;
         }
 
+        if (ret > 0 && this->buff[0] == '>') {
+            readsome();
+            return;
+        }
+
         if (ret > 0 && this->buff[ret-1] == '\n') {
             --ret;
         }
@@ -41,7 +46,6 @@ public:
         : pf(NULL), fpath(path), buff(NULL), bsz(0), sz(0) {
         this->pf = fopen(path.c_str(), "r");
         assert(this->pf);
-        ::getline(&this->buff, &this->sz, this->pf);
     }
 
     int
@@ -56,7 +60,7 @@ public:
                 }
             }
 
-            int m = this->bsz < size ? this->bsz : tr;
+            int m = this->bsz < tr ? this->bsz : tr;
             memmove(out, this->buff, m);
 
             int rem = this->bsz - m;
@@ -78,14 +82,15 @@ public:
 namespace fasta {
     int
     test() {
-        return 0;
-        FastaReader fr("data/chr/chr1.fa");
+        // return 0;
+        // FastaReader fr("data/chr/chr1.fa");
+        FastaReader fr("data/fasta_Watson_0");
         char buff[1024];
         int r = fr.read(buff, 50);
 
         while (r) {
             buff[r] = '\0';
-            printf("%s\n", buff);
+            printf("%s", buff);
             r = fr.read(buff, 50);
         }
         return 0;
