@@ -123,7 +123,7 @@ struct SuffixArray {
     bool
     make_ranks1(vi_t &data, vi_t &indexes, vi_t &ranks) {
         // ranks.clear();
-        const size_t n = indexes.size();
+        const int n = (int)indexes.size();
         assert(n > 0);
 
         ranks.resize(n);
@@ -131,7 +131,7 @@ struct SuffixArray {
         int prev = data[indexes[0]];
         int max_rank = 1;
 
-        for (size_t i = 0; i < n; ++i) {
+        for (int i = 0; i < n; ++i) {
             DPRINTF("data: %d, prev: %d\n", data[indexes[i]], prev);
             if (data[indexes[i]] != prev) {
                 ++rank;
@@ -146,7 +146,7 @@ struct SuffixArray {
     bool
     make_ranks2(vi_t &data, vi_t &indexes, vi_t &ranks, int sz) {
         // ranks.clear();
-        const size_t n = indexes.size();
+        const int n = (int)indexes.size();
         assert(n > 0);
 
         ranks.resize(n);
@@ -155,7 +155,7 @@ struct SuffixArray {
         int x = data[indexes[0]];
         int y = get_rank(data, indexes[0]+sz);
 
-        for (size_t i = 0; i < n; ++i) {
+        for (int i = 0; i < n; ++i) {
             int r1 = data[indexes[i]];
             int r2 = get_rank(data, indexes[i]+sz);
             DPRINTF("indexes[%d]: %d\n", i, indexes[i]);

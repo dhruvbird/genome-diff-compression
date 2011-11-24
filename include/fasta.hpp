@@ -48,6 +48,22 @@ public:
         assert(this->pf);
     }
 
+    FastaReader(FILE *_pf)
+        :pf(_pf), bsz(0), sz(0) {
+        assert(this->pf);
+    }
+
+    void
+    seek(int offset) {
+        char tmp[4096];
+        int r = offset < 4096 ? offset : 4096;
+        while (r) {
+            read(tmp, r);
+            offset -= r;
+            r = offset < 4096 ? offset : 4096;
+        }
+    }
+
     int
     read(char *out, int size) {
         int ctr = 0;
@@ -76,6 +92,11 @@ public:
         return ctr;
     }
 
+    ~FastaReader() {
+        if (!this->fpath.empty()) {
+            ::fclose(this->pf);
+        }
+    }
 
 };
 
