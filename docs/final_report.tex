@@ -1,4 +1,4 @@
-\documentclass[11pt,twocolumn]{article}
+\documentclass[11pt]{article}
 
 \usepackage{hyperref}
 \usepackage{graphicx}
@@ -21,17 +21,122 @@
 
 \begin{abstract}
   We present a way to compress the complete human genome against a
-  reference genome to achieve \textit{131x} compression. We shall also
-  prove that for the representation used, this is the optimal
-  compression that can be achieved. We shall first motivate the
-  problem itself, show existing research that has been done in this
-  direction, present our approach, and compare it with prior work.
+  reference genome to achieve \textit{131x} compression. Our
+  approaches compresses a \textit{2.6GiB} human genome to about
+  \textit{21MiB}. The compression method is such that decompression
+  from random offsets is fast. Our method does not rely on the target
+  genome being almost of the same size as the reference genome, or the
+  existence of any alignment program available to us. We shall also
+  prove that for the representation used, the technique we propose
+  achieves optimal compression.
+
+  We shall first motivate the problem itself, show existing research
+  that has been done in this direction, present our approach, and
+  compare it with prior work.
 
 \end{abstract}
 
-\section{Introduction}
+\section{Motivation}
+
+The Complete Human Genome was sequenced in 2003. Since then a lot of
+research is being done in genomics and computational biology. The
+major input for most of the computation is the 2.9 billion base pairs
+\cite{howmuchsequenced}\cite{findinghumangenome} of the human genome
+which correspond to a maximum of about 725 megabytes of human
+genome data.\cite{wikipediahumangenome}
+
+Furthermore, reduction in the cost of sequencing (via the ``next-gen''
+sequencing platforms) has given birth to the 1000 genomes project
+\footnote{\url{http://www.1000genomes.org/}} which aims to sequence
+the genomes of a large number of people. Just like the other human
+genome reference projects, this data (estimated 8.2 billion bases per
+day) would be made available via public databases for the scientific
+community.\cite{1000genomes}
+
+As we can now see, we are dealing with megabytes and megabytes of data 
+when we work with genomes! This gives rise to challenging 
+problems with respect to storage, distribution (downloading, copying), 
+and sharing of this genomic data. Hence we need to consider better 
+compression techniques for the genomic data. That apart, when working
+with genomic data, we want to be able to optimize decompression so
+that working with these compressed genomes is no harder than working
+with the uncompressed genome.
+
+The goal of the 1000 genomes project is to find most genetic variants
+that have frequencies of at least 1\% in the populations
+studied. Similarly, once the \$1000 genome
+project\cite{1000dollargenomeproject} becomes successful, storage
+costs for all the sequenced genomes will need to be kept under
+control. To be able to do this, we need an space (and time) efficient
+way of compressing the sequenced genomes so that the DNA of more
+people can be sequenced for a reasonable price.
+
+We explore the problem of genome compression and see if we can:
+
+\begin{itemize}
+
+\item Better align 2 human genomes so as to facilitate better
+  compression on them
+
+\item Better compress the human genome to a smaller on-disk
+  representation
+
+\item Enable faster decompression
+
+\item Enable space-efficient decompression
+
+\item Enable I/O efficient decompression so that working with the
+  compressed genome is the norm rather than the exception
+
+\end{itemize}
 
 \section{Existing Research}
+
+\subsection{gzip \& bzip2}
+
+These 2 applications are general lossless compression routines that
+use run-length encoding and block sort compression respectively. They
+can compress the human genome (about 3GiB) to about 830MiB, which is a
+compression ratio of \textit{3.67}.
+
+\subsection{GenCompress, BioCompress \& Cfact}
+
+GenCompress\cite{gencompress}, BioCompress\cite{biocompress} \&
+Cfact\cite{cfact} are tools that mostly rely on either Huffman Coding,
+Ziv-Lempel\cite{zivlempel}, or Arithmetic Coding to compress the human
+genome. They are able achieve better compression when compared with
+\textit{gzip \& bzip2}, but not as much as some of the difference
+encoding methods mentioned below. These methods achieve compression
+ratios of anywhere from \textit{4.82 -- 7.00}.
+
+\subsection{Difference Encoding Techniques}
+
+Difference encoding schemes are getting very popular since they can
+achieve very high compression ratios of greater than \textit{100}
+since \textit{99.9\%} of the genomes of 2 humans are similar to each
+other. There are very few variations between the genomes of 2
+individuals.
+
+DNAzip\cite{dnazip} was the first algorithm to compress the target
+genome by storing differences between the target and reference
+genome. However, DNAzip does not solve the problem of aligning 2
+genomes with each other, but instead assumes the existence of an
+\textit{SNP -- Single Nucleotide Polymorphism} file to exist, which it
+takes in as input. In our experience, aligning 2 genomes is a very
+time consuming process and is orders of magnitude slower than
+performing the actual compression itself.
+
+Wang \& Zhang came up with a difference compression technique that was
+able to compress \textit{2986MiB} of a Korean genome to
+\textit{18.8MiB}. This was done by difference compressing it against
+another Korean genome which was sequenced using similar methods and
+had the about the same size. their technique considers blocks of bases
+of size 50, 20 or 10 million, and groups each chromosome from both the
+target and the reference in these blocks to compute the difference
+between them. This may not always work with genomes that have
+sequenced and assembled using different techniques, or if you are
+using the human genome as a reference to compress the mouse genome for
+example.
 
 \section{Our Solution}
 
@@ -41,5 +146,52 @@
 
 \clearpage
 
+\begin{thebibliography}{9}
+
+\bibitem{dnazip} DNAzip: DNA sequence compression using a reference
+  genome \url{http://www.ics.uci.edu/~dnazip/}
+\bibitem{howmuchsequenced}
+How much of the human genome has been sequenced?
+\url{http://www.strategicgenomics.com/Genome/index.htm}
+\bibitem{findinghumangenome}
+Finishing the euchromatic sequence of the human genome
+\url{http://www.nature.com/nature/journal/v431/n7011/abs/nature03001.html}
+\bibitem{wikipediahumangenome}
+Wikipedia on The Human Genome
+\url{http://en.wikipedia.org/wiki/Human\_genome}
+\bibitem{1000genomes}
+The 100 genomes project aims to provide a comprehensive resource on
+human genetic variation. \url{http://www.1000genomes.org/about}
+\bibitem{zivlempel}
+A Universal Algorithm for Sequential Data Compression, IEEE
+Trans. Information Theory, vol. 23, pp. 337-343, 1977.
+\bibitem{gencompress}
+DNABIT Compress -- Genome compression algorithm. Pothuraju
+Rajarajeswari and Allam Apparao
+\bibitem{biocompress}
+A New Challenge for Compression Algorithms: Genetic Sequences,
+S. Grumbach and F. Tahi, Information Processing Management, vol. 30,
+no. 6, pp. 875-886, 1994.
+\bibitem{cfact}
+A Guarantee DNA Sequences for Repetitive DNA Sequences, E. Rivals,
+J.P.Delahaye, M.Dauchet, and O.Delgrange, LIFL Lille I University,
+Technical Report IT-285, 1995.
+\bibitem{6}
+http://bioinformatics.oxfordjournals.org/content/25/2/274.full
+\bibitem{7}
+http://lh3lh3.users.sourceforge.net/parsefastq.shtml
+\bibitem{8}
+http://fasta.bioch.virginia.edu/fasta\_www2/fasta\_down.shtml
+
+\bibitem{1000dollargenomeproject}
+Anticipating the 1,000 dollar genome.
+Mardis ER
+
+\bibitem{genomecompressionchenli}
+Human genomes as email attachments.
+Scott Christley, Yiming Lu, Chen Li, \and Xiaohui Xie
+
+
+\end{thebibliography}
 
 \end{document}
