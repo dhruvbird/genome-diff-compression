@@ -1,22 +1,25 @@
 #include <iostream>
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <include/utils.hpp>
 
 using namespace std;
 
 int
-main() {
-    const char *tmpl = "out22.%d.txt";
+main(int argc, char *argv[]) {
+    assert(argc > 1);
+    const char *tmpl = "out%d.%d.txt";
     char fbuff[1024];
     int code, doff, soff, len;
+    int chr_num = atoi(argv[1]);
 
-    sprintf(fbuff, tmpl, 0);
+    sprintf(fbuff, tmpl, chr_num, 0);
     FILE *pout = fopen(fbuff, "w");
     assert(pout);
 
     for (int i = 1; i < 100; ++i) {
-        sprintf(fbuff, tmpl, i);
+        sprintf(fbuff, tmpl, chr_num, i);
         if (!file_exists(fbuff)) {
             break;
         }
