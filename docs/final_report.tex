@@ -264,6 +264,63 @@ If there is a better solution at any stage, then it would have been
 the one chosen by our algorithm for extending a range from a given
 index.
 
+\subsection{Practical Considerations}
+
+We ran the experiments on a 32-bit WMWare Player Virtual Machine
+running Ubuntu 11.04, with Windows 7 as the Host Operating
+System. Since the guest is a 32-bit system, the process address space
+is limited to 4GiB, out of which about 1.5GiB of the higher address
+space is used up by the kernel and dynamically loaded libraries such
+as \textit{glibc}, etc\ldots{}. This leaves us with 2.5GiB to
+use. When constructing the Suffix Array, we have observed that there
+are rarely substrings greater than \textit{65,536} in length that
+overlap in 2 genomes. This means that we can cap the extra space
+required by the suffix array construction algorithm to $16n \times
+sizeof(int)$. An additional $3n$ space overhead is incurred to store
+the input string and a $5n \times sizeof(int)$ overhead is incurred
+while computing the optimal overlap of ranges.
+
+All this adds up to (in bytes):\\
+$16n \times sizeof(int) + 3n + 5n \times sizeof(int)$\\
+$= 16n \times 4 + 3n + 5n \times 4$\\
+$= 64n + 3n + 20n$\\
+$= 87n$\\
+
+Hence, the space requirement for our algorithm is $O(n)$, with a
+fairly high constant overhead.
+
+Equating the 2 sides, we get:\\
+$2.5 \times 1024^3 = 87n$\\
+Solving for $n$, we get:\\
+$n = 30854650$\\
+which translates to about \textit{30 million}.
+
+Hence, we can process only strings of length \textit{30 million} at a
+time with the process address space that we have.
+
+Experimentally, we determined that we got the best results if we chose
+\textit{16MiB} of data from the reference chromosome \& \textit{6MiB} of
+data from the target chromosome. We had to rune some more experiments
+to find out the best way to align these blocks so that maximum
+compression for the target could be achieved. We found that we
+occationally need to align each block of \textit{6MiB} with
+potentially \textit{2--3} blocks of size \textit{16MiB} from the
+reference to get the best compression. Generally \textit{uncompressed
+  plain-text} difference files for \textit{6MiB} from the target range
+anywhere from {\textit{90KiB to 300KiB}}. If we see results in this
+range, we don't try other ranges.
+
+This \textit{block based} processing of the chromosomes results in
+sub-optimal compression, but:
+\begin{itemize}
+\item Allows us to work around process address space limits even
+  though the machine might have enough physical memory.
+\item Results in faster decompression since the hard disk needle need
+  not seek too far (the 16MiB block from which the differences are
+  generated is all that is needed to uncompress a 6MiB block). This
+  makes decompression a very \textit{I/O-efficient} process -- almost
+  making it \textit{cache-oblivious}.
+\end{itemize}
 
 \section{Approaches Compared}
 
