@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <include/utils.hpp>
 
 using namespace std;
@@ -29,10 +30,15 @@ main(int argc, char *argv[]) {
         while (!feof(fin)) {
             fscanf(fin, "%d %d %d %d", &code, &doff, &soff, &len);
             fwrite(&soff, sizeof(soff), 1, pout);
-            if (len < 64) {
-                char clen = len;
-                clen |= (1 << 7);
+            if (len < 128) {
+                uint8_t clen = len;
+                clen |= 128;
                 fwrite(&clen, sizeof(clen), 1, pout);
+            }
+            else if (len < 16384) {
+                uint16_t slen = len;
+                len |= 16384;
+                fwrite(&slen, sizeof(slen), 1, pout);
             }
             else {
                 fwrite(&len, sizeof(len), 1, pout);

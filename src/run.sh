@@ -12,7 +12,7 @@
 # time ./main data/chr14.fa data/HuRef_14.fa 56 60 > out14.11.txt
 # time ./main data/chr14.fa data/HuRef_14.fa 61 66 > out14.12.txt
 # time ./main data/chr14.fa data/HuRef_14.fa 65 72 > out14.13.txt
-time ./main data/chr14.fa data/HuRef_14.fa 70 78 > out14.14.txt
+# time ./main data/chr14.fa data/HuRef_14.fa 70 78 > out14.14.txt
 
 
 # time ./main data/chr22.fa data/HuRef_22.fa 0 0 > out22.1.txt
