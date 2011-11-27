@@ -200,7 +200,7 @@ the target and reference genomes even if:
 \item The 2 genomes have different lengths.
 \item The genomes have been sequenced and assembled using different
   apparatus and methods.
-\item You try to compress the mous genome with a human genome as a
+\item You try to compress the mouse genome with a human genome as a
   reference.
 \end{itemize}
 
@@ -391,7 +391,12 @@ decompression.
 
 \subsection{Practical Considerations}
 
-We ran the experiments on a 32-bit WMWare Player Virtual Machine
+Every chromosome of the target genome was stripped off any \textit{N}
+characters (unknown base-pair) before compressing it against the
+reference genome's corresponding chromosome. These unknown base-pairs
+mostly occur at the beginning and end of the chromosome.
+
+We ran the experiments on a 32-bit VMWare Player Virtual Machine
 running Ubuntu 11.04, with Windows 7 as the Host Operating
 System. Since the guest is a 32-bit system, the process address space
 is limited to 4GiB, out of which about 1.5GiB of the higher address
@@ -529,7 +534,31 @@ offset decompression.
 
 \section{Experimental Results}
 
-TODO: Add numbers for the chromosomes we have run it on.
+When run on \textit{hg18} as the reference genome and \textit{BUILD
+  36.3} of the human genome reference as the target genome, here are
+the results we got for some chromosomes.
+
+\begin{center}
+  \begin{tabular}{|c|r|r|r|}
+    \hline
+    Chromosome & Original Size (MiB) & Compressed Size (KiB) & \% Compression\\
+    \hline
+    14 & 83 & 550 & 154.5\\
+    \hline
+    15 & 73 & 558 & 133.9\\
+    \hline
+    20 & 57 & 384 & 152.0\\
+    \hline
+    21 & 32 & 217 & 151.0\\
+    \hline
+    22 & 32 & 241 & 135.9\\
+    \hline
+  \end{tabular}\\
+  \vspace{0.3cm}
+  \footnotesize{Figure-\arabic{fignum}: Compression of certain human chromosomes.}
+  \addtocounter{fignum}{1}
+\end{center}
+
 
 \section{Future Work}
 
@@ -549,7 +578,7 @@ earlier lethargy was the phenomenon of \textit{Temporal
   past (i.e., become so distant in time that they cease to be valuable
   or to have additive effects).}
 
-We would also like to thank Aniruddha Laud, Gaurav menghani, \&
+We would also like to thank Aniruddha Laud, Gaurav Menghani, \&
 Madhava K R, who patiently explained the working of
 DNAzip\cite{dnazip} to us.
 
