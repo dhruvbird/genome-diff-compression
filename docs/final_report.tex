@@ -124,14 +124,14 @@ since \textit{99.9\%} of the genomes of 2 humans are similar to each
 other. There are very few variations between the genomes of 2
 individuals.
 
-DNAzip\cite{dnazip} was the first algorithm to compress the target
-genome by storing differences between the target and reference
-genome. However, DNAzip does not solve the problem of aligning 2
-genomes with each other, but instead assumes the existence of an
-\textit{SNP -- Single Nucleotide Polymorphism} file to exist, which it
-takes in as input. In our experience, aligning 2 genomes is a very
-time consuming process and is orders of magnitude slower than
-performing the actual compression itself.
+DNAzip\cite{dnazip}\cite{genomecompressionchenli} was the first
+algorithm to compress the target genome by storing differences between
+the target and reference genome. However, DNAzip does not solve the
+problem of aligning 2 genomes with each other, but instead assumes the
+existence of an \textit{SNP -- Single Nucleotide Polymorphism} file to
+exist, which it takes in as input. In our experience, aligning 2
+genomes is a very time consuming process and is orders of magnitude
+slower than performing the actual compression itself.
 
 Wang \& Zhang\cite{wangzhang} have come up with a difference
 compression technique that is able to compress \textit{2986MiB} of a
@@ -192,6 +192,18 @@ Subsequently, the plain-text file containing these optimal number of
 ranges is encoded in a binary format and the resulting binary file is
 further compressed using \textit{gzip} to produce the final compressed
 difference file.
+
+Hence, it is easy to see that our approach will provide good
+compression as long as there is a sufficient amount of overlap between
+the target and reference genomes even if:
+\begin{itemize}
+\item The 2 genomes have different lengths.
+\item The genomes have been sequenced and assembled using different
+  apparatus and methods.
+\item You try to compress the mous genome with a human genome as a
+  reference.
+\end{itemize}
+
 
 \subsection{The Algorithm}
 
@@ -301,11 +313,76 @@ index.
 
 \subsection{Binary Encoding}
 
-TODO
+We use a tight binary format to represent the \textit{(offset,
+  length)} pairs into the reference that are needed to represent the
+target genome.
+
+Each line in the intermediate plain-text range file holds an
+\textit{(offset, length)} pair that needs to be encoded. Since offsets
+can be quite large, we always encode them as fixed 32-bit
+integers. The length values however have a different distribution. For
+a chromosome we compressed, here is the distribution of length values.
+
+\begin{center}
+  \begin{tabular}{|c|c|c|c|}
+    \hline
+    Range of Values & [1\ldots{}127] & [128\ldots{}16383] & [16384\ldots{}]\\
+    \hline
+    Counts & 56620502 & 60686338 & 2602\\
+    \hline
+    Percentages & 48.27\% & 51.73\% & 0.0022\%\\
+    \hline
+  \end{tabular}\\
+  \vspace{0.3cm}
+
+  \footnotesize{Figure-\arabic{fignum}: Distribution of length values
+    in the compressed ranges file.}
+
+  \addtocounter{fignum}{1}
+\end{center}
+
+All values in the range [1\ldots{}127] are encoded as a single byte
+integer with the MSB set to \texttt{1}. Values in the range
+[128\ldots{}16383] are encoded as 2-byte integers, with the first 2
+most significant bits set to \texttt{01}. Values greater than 16383
+are encoded as 4-byte integers with the first 2 most significant bits
+set to \texttt{00}. This allows us to uniquely identify the size of
+the value based just on the value of the 2 most significant bits of
+the integer.
 
 \subsection{Decompression}
 
-TODO
+The difference encoded file looks like this:
+\begin{verbatim}
+61771 51
+7829  89
+17288 12
+7288  6523
+\end{verbatim}
+
+These are ranges with lengths 51, 89, 12, \& 6523. We construct an
+intermediate file containing the cumulative lengths to allow quick
+random retrieval. The pre-processed data looks like this:
+
+\begin{verbatim}
+61771 0
+7829  51
+17288 140
+7288  152
+--    6675
+\end{verbatim}
+
+Now, to get the decompressed chromosome data of length 100 at offset
+130, we need to just do a \textit{Binary Search} into the cumulative
+length array and find the location of offset 130. This happens to be
+at offset 7829+79 in the reference file. The range of length 200
+happens to span 3 ranges, one is the previous range, and the other
+ones are at offset 17288 with length 12 and offset 7288 with length
+109. Since all the blocks in the reference come from the same
+chromosome, we can prevent disk seeks by loading the whole chromosome
+into memory before starting decompression (or alternatively incur a
+cost of a few disk seeks per retrieval).
+
 
 \subsection{Practical Considerations}
 
@@ -342,16 +419,17 @@ Hence, we can process only strings of length \textit{30 million} at a
 time with the process address space that we have.
 
 Experimentally, we determined that we got the best results if we chose
-\textit{16MiB} of data from the reference chromosome \& \textit{6MiB} of
-data from the target chromosome. We had to rune some more experiments
-to find out the best way to align these blocks so that maximum
-compression for the target could be achieved. We found that we
-occationally need to align each block of \textit{6MiB} with
-potentially \textit{2--3} blocks of size \textit{16MiB} from the
-reference to get the best compression. Generally \textit{uncompressed
-  plain-text} difference files for \textit{6MiB} from the target range
-anywhere from {\textit{90KiB to 300KiB}}. If we see results in this
-range, we don't try other ranges.
+\textit{16MiB} of data from the reference chromosome \& \textit{6MiB}
+of data from the target chromosome (totalling \textit{22MiB} in
+all). We had to rune some more experiments to find out the best way to
+align these blocks so that maximum compression for the target could be
+achieved. We found that we occationally need to align each block of
+\textit{6MiB} with potentially \textit{2--3} blocks of size
+\textit{16MiB} from the reference to get the best
+compression. Generally \textit{uncompressed plain-text} difference
+files for \textit{6MiB} from the target range anywhere from
+{\textit{90KiB to 300KiB}}. If we see results in this range, we don't
+try other ranges.
 
 This \textit{block based} processing of the chromosomes results in
 sub-optimal compression, but:
@@ -430,7 +508,7 @@ offset decompression.
     \hline
     GRS & Yes & Yes & 18.8MiB & 159 & Yes & Not clear\\
     \hline
-    VTech & Yes & Yes & 36MiB & 85 & Yes & Yes $(O\log{n})$\\
+    VTech & Yes & Yes & 36MiB & 85 & Yes & Yes $O(\log{n})$\\
     \hline
     Cairo & Yes & Yes & 18.5MiB & 166 & Yes & No\\
     \hline
@@ -518,14 +596,6 @@ Wahed
 \bibitem{manbermyers}
 Suffix arrays: A new method for on-line string searches, Udi Manber
 and Gene Myers
-\bibitem{6}
-http://bioinformatics.oxfordjournals.org/content/25/2/274.full
-\bibitem{7}
-http://lh3lh3.users.sourceforge.net/parsefastq.shtml
-\bibitem{8}
-http://fasta.bioch.virginia.edu/fasta\_www2/fasta\_down.shtml
-
-
 \bibitem{genomecompressionchenli}
 Human genomes as email attachments.
 Scott Christley, Yiming Lu, Chen Li, \and Xiaohui Xie
