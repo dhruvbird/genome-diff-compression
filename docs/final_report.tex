@@ -9,12 +9,12 @@
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{1.9ex plus 0.5ex minus 0.2ex}
 
-\newcounter{fignum}
-\setcounter{fignum}{1}
+% \newcounter{figure}
+% \setcounter{figure}{1}
 
 \begin{document}
 
-\title{Compressing the Human Genome against a reference}
+\title{Compressing the Human Genome against a reference (draft-1)}
 \author{Pragya Pande\\\texttt{\small{ppande@cs.stonybrook.edu}}\\\small{Stony Brook University} \and 
   Dhruv Matani\\\texttt{\small{dmatani@cs.stonybrook.edu}}\\\small{Stony Brook University}
 }
@@ -204,7 +204,13 @@ the target and reference genomes even if:
   reference.
 \end{itemize}
 
-TODO: Add figure
+\begin{figure}
+  \begin{center}
+    \includegraphics[height=4.1in]{figures/GenomeCompressionFlow.png}
+    \caption{The flow of Genome Compression}
+    \label{fig:genomecompressionflow}
+  \end{center}
+\end {figure}
 
 \subsection{The Algorithm}
 
@@ -255,13 +261,17 @@ the whole range?
     \hline
   \end{tabular}\\
   \vspace{0.3cm}
-  \footnotesize{Figure-\arabic{fignum}: Indexes and lengths of ranges
+
+  \addtocounter{figure}{1}
+  \footnotesize{Figure-\arabic{figure}: Indexes and lengths of ranges
     at those indexes}
-  \addtocounter{fignum}{1}
 \end{center}
 
 The best solution extends the smallest range that it can cover to its
 right.
+
+% HACK!!
+\clearpage
 
 \begin{center}
   \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
@@ -274,13 +284,14 @@ right.
     \hline
   \end{tabular}\\
   \vspace{0.3cm}
-  \footnotesize{Figure-\arabic{fignum}: If we have the solution till index
-    $7$, and we want to extend it to compute the solution till index
-    $6$, then we scan up to $3$ (the length of the longest range at
-    index $6$) places to the right of index $6$ (shown in
+
+  \addtocounter{figure}{1}
+  \footnotesize{Figure-\arabic{figure}: If we have the solution till
+    index $7$, and we want to extend it to compute the solution till
+    index $6$, then we scan up to $3$ (the length of the longest range
+    at index $6$) places to the right of index $6$ (shown in
     \textcolor{red}{red}), and locate the smallest value in that range
     (shown in bold face).}
-  \addtocounter{fignum}{1}
 \end{center}
 
 
@@ -298,14 +309,14 @@ right.
   \end{tabular}\\
   \vspace{0.3cm}
 
-  \footnotesize{Figure-\arabic{fignum}: The numbers in
+  \addtocounter{figure}{1}
+  \footnotesize{Figure-\arabic{figure}: The numbers in
     \textcolor{red}{red} indicate the range end-points that make up
     the ranges that cover the entire sequence. If there are \textit{n}
     numbers, there exist \textit{(n-1)} ranges. Range extension stops
     when we have gone past the last index in the sequence (14 in this
     example).}
 
-  \addtocounter{fignum}{1}
 \end{center}
 
 If there is a better solution at any stage, then it would have been
@@ -336,10 +347,10 @@ a chromosome we compressed, here is the distribution of length values.
   \end{tabular}\\
   \vspace{0.3cm}
 
-  \footnotesize{Figure-\arabic{fignum}: Distribution of length values
+  \addtocounter{figure}{1}
+  \footnotesize{Figure-\arabic{figure}: Distribution of length values
     in the compressed ranges file.}
 
-  \addtocounter{fignum}{1}
 \end{center}
 
 All values in the range [1\ldots{}127] are encoded as a single byte
@@ -471,9 +482,9 @@ The DNAzip group relies on an existing \textit{SNP} file being
 present, and hence they don't do sequence alignment before compressing
 the difference file.
 
-It isn't possible to get the decompressed genome data at a certain
-\textit{(offset, length)} pair without decompressing the complete
-genome.
+It isn't possible to trivially get the decompressed genome data at a
+certain \textit{(offset, length)} pair without decompressing the
+complete genome.
 
 \subsection{Wang \& Zhang's method}
 
@@ -526,9 +537,11 @@ offset decompression.
     \hline
   \end{tabular}\\
   \vspace{0.3cm}
-  \footnotesize{Figure-\arabic{fignum}: A comparison of various
+
+  \addtocounter{figure}{1}
+  \footnotesize{Figure-\arabic{figure}: A comparison of various
     approaches}
-  \addtocounter{fignum}{1}
+
 \end{center}
 
 
@@ -541,7 +554,8 @@ the results we got for some chromosomes.
 \begin{center}
   \begin{tabular}{|c|r|r|r|}
     \hline
-    Chromosome & Original Size (MiB) & Compressed Size (KiB) & \% Compression\\
+    Chromosome & Original (MiB) & Compressed (KiB) & Compression
+    Ratio\\
     \hline
     14 & 83 & 550 & 154.5\\
     \hline
@@ -555,15 +569,25 @@ the results we got for some chromosomes.
     \hline
   \end{tabular}\\
   \vspace{0.3cm}
-  \footnotesize{Figure-\arabic{fignum}: Compression of certain human chromosomes.}
-  \addtocounter{fignum}{1}
+
+  \addtocounter{figure}{1}
+  \footnotesize{Figure-\arabic{figure}: Compression of certain human
+    chromosomes.}
+
 \end{center}
 
 
 \section{Future Work}
 
-TODO: Parallelization since each chromosome encoded is independent,
-etc...
+Compressing the genome \textit{6MiB} at a time against \textit{16MiB} of
+data from the reference takes about \textit{15.5 minutes} on a single
+core (CPU).
+
+This computation can be parallelized across multiple cores. If the
+compression is being done a chromosome-at-a-time, then each chromosome
+can be processed on a separate CPU so that the total time required is
+the \textit{maximum} of the time required to compress each chromosome
+rather than the \textit{sum} of their times.
 
 \section{Acknowledgments}
 
