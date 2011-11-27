@@ -382,7 +382,11 @@ ones are at offset 17288 with length 12 and offset 7288 with length
 109. Since all the blocks in the reference come from the same
 chromosome, we can prevent disk seeks by loading the whole chromosome
 into memory before starting decompression (or alternatively incur a
-cost of a few disk seeks per retrieval).
+cost of a few disk seeks per retrieval). If we consider the case where
+we have many genomes compressed with respect to a fixed reference
+genome, then it is sufficient to just keep that genome, and all the
+difference files in memory to ensure fast random \& sequential
+decompression.
 
 
 \subsection{Practical Considerations}
