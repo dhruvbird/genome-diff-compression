@@ -14,7 +14,7 @@
 
 \begin{document}
 
-\title{Compressing the Human Genome against a reference (draft-1)}
+\title{Compressing the Human Genome against a reference (draft-6)}
 \author{Pragya Pande\\\texttt{\small{ppande@cs.stonybrook.edu}}\\\small{Stony Brook University} \and 
   Dhruv Matani\\\texttt{\small{dmatani@cs.stonybrook.edu}}\\\small{Stony Brook University}
 }
@@ -26,10 +26,22 @@
 
 \begin{abstract}
   We present a way to compress the complete human genome against a
-  reference genome to achieve \textit{139x} compression. Our
-  approaches compresses a \textit{2.6GiB} human genome to about
-  \textit{19.2MiB}. The compression method is such that decompression
-  from random offsets is fast. Our method does not rely on the target
+  reference genome to achieve \textit{139x - 895x} compression. Our
+  approach can potentially compress \textit{BUILD 36.3} of the human
+  reference genome against (about \textit{2.6GiB}) \textit{BUILD 36.1}
+  (also known as \textit{hg18}) to achieve a compression ratio of
+  \textit{139x} (about \textit{19.2MiB}). The Korean genome
+  \textit{KOREF\_20090224} (about \textit{2.9GiB}) can be compressed
+  against \textit{KOREF\_20090131} to achieve a compression ratio of
+  \textit{895x}, resulting in a file of size about
+  \textit{3.3MiB}\footnote{These results are extrapolated from tests
+    we ran on a subset of chromosomes for each genome pair}.
+
+  The compressed differences are stored such that decompression from
+  random offsets is fast. Furthermore, our \textit{range format} for
+  storing differences allows us to \textit{efficiently} compute
+  \textit{transitive differences} between the target genome and
+  different reference genomes. Our method does not rely on the target
   genome being almost of the same size as the reference genome, or the
   existence of any alignment program available to us. We shall also
   prove that for the representation used, the technique we propose
@@ -40,6 +52,14 @@
   compare it with prior work.
 
 \end{abstract}
+
+\setlength{\parskip}{0.7ex plus 0.5ex minus 0.2ex}
+
+\clearpage
+
+\tableofcontents
+
+\setlength{\parskip}{1.9ex plus 0.5ex minus 0.2ex}
 
 \clearpage
 
@@ -78,6 +98,19 @@ control. To be able to do this, we need an space (and time) efficient
 way of compressing the sequenced genomes so that the DNA of more
 people can be sequenced for a reasonable price.
 
+Multiple laboratories might use different reference genomes to
+compress the genomes they sequence. For example, a Korean lab might
+want to use a Korean genome as reference since it will be closer to
+the genome of other Koreans. Other laboratores might have their own
+reference genomes. However, if labs want to share sequenced genomes,
+it becomes hard to share the difference compressed genome if the
+differences have been computed with respect to different reference
+genomes. One option is to decompress the sequenced genome and
+recompress it using the target reference as the reference
+genome. However, since the compression is a time consuming process, we
+would like to be able to quickly re-encode the genome with reference
+to a difference reference genome.
+
 We explore the problem of genome compression and see if we can:
 
 \begin{itemize}
@@ -94,6 +127,9 @@ We explore the problem of genome compression and see if we can:
 
 \item Enable I/O efficient decompression so that working with the
   compressed genome is the norm rather than the exception
+
+\item Support \textit{efficient transitive compression} of a genome
+  with respect to multiple reference genomes
 
 \end{itemize}
 
@@ -212,6 +248,8 @@ the target and reference genomes even if:
   \end{center}
 \end {figure}
 
+\clearpage
+
 \subsection{The Algorithm}
 
 \begin{enumerate}
@@ -229,17 +267,67 @@ the target and reference genomes even if:
 
 \item Now that we have all the ranges in $Ref_i$ that $Victim_i$ can
   be covered by, we find the least number of ranges that can
-  completely cover $Victim_i$. This can be done in $O(n\log{n})$ time
-  using \textit{Dynamic Programming} and \textit{Segment Trees} as an
-  online \textit{Range Minimum Query} data structure. The problem of
-  finding the minimal number of completely covering sub-ranges
-  exhibits optimal substructure. i.e. A solution for the range
-  $[i\ldots{}n]$ can be constructed using the solution to the ranges
-  $[i+1\ldots{}n], [i+2\ldots{}n], [i+3\ldots{}n], \ldots{},
+  completely cover $Victim_i$. This can be done in
+  $O(n\log{n})$\footnote{There is also a (single-pass) $O(n)$
+    time algorithm to do the same, but we don't talk about it here}
+  time using \textit{Dynamic Programming} and \textit{Segment Trees}
+  as an online \textit{Range Minimum Query} data structure. The
+  problem of finding the minimal number of completely covering
+  sub-ranges exhibits optimal substructure. i.e. A solution for the
+  range $[i\ldots{}n]$ can be constructed using the solution to the
+  ranges $[i+1\ldots{}n], [i+2\ldots{}n], [i+3\ldots{}n], \ldots{},
   [i+k-1\ldots{}n]$, where $k$ is the length of the range starting at
   index $i$.
 
 \end{enumerate}
+
+\subsection{Transitive Difference Computation}
+
+Suppose \textit{V} is the victim genome that is already compressed
+with reference to the reference genome \textit{$R_1$}, and we want to
+compress it with respect to reference genome \textit{$R_2$}, then we
+need to compute how genome \textit{$R_1$} compress with respect to
+genome \textit{$R_2$}. Since we expect to compress many victims with
+respect to a fixed number of variable references, we can ignore the
+cost of computing this difference. Besides, this is just a one time
+process and once the delta \textit{$R_1 - R_2$} has been computed, we
+can reuse it indefinitely.
+
+\begin{figure}
+  \begin{center}
+    \includegraphics[height=2.5in]{figures/TransitiveDifference.png}
+    \caption{Transitive Difference Computation}
+    \label{fig:transitivedifferencecomputation}
+  \end{center}
+\end {figure}
+
+To be able to compute transitive differences, we need to slightly
+modify the output of the compression routine. Instead of storing just
+the tuple \textit{(offset, length)}, we store the tuple
+\textit{(offset, length, span)}, where \textit{span} is the actual
+span of the range (length of maximum match) between the victim and
+reference. This span is the value computed using the suffix array and
+longest common prefix algorithm.
+
+Now, given the files \textit{$V - R_1$} and \textit{$R_1 - R_2$}, we
+need to find, for every offset \textit{i} in \textit{V}, in index
+\textit{j} in \textit{$R_1$} where it can be found. Once we know the
+value of \textit{j}, we lookup \textit{$R_1 - R_2$} to locate the
+index \textit{k} in \textit{$R_2$} of the index \textit{j} in
+\textit{$R_1$}. This lookup need not be done on a per index basis, but
+can instead be done on a range basis. This is an optimization that
+reduces the running time of this algorithm.
+
+Each lookup into the difference file \textit{$R_1 - R_2$} costs
+$O(\log{n})$, (where $n$ is the number of lines in \textit{$R_1 -
+  R_2$}) and we need to process \textit{$O(m)$} such ranges (since
+ranges may get split during this operation). Here, $m$ is the total
+number of lines in the file \textit{$V - R_1$}. Hence, the total
+running time of the transitive difference computation routine is
+$O(m\log{n})$.
+
+We must mention however that the differences computed using the
+transitive difference routine are \textit{not} optimal.
 
 \subsection{Proof of Optimality}
 
@@ -269,9 +357,6 @@ the whole range?
 
 The best solution extends the smallest range that it can cover to its
 right.
-
-% HACK!!
-\clearpage
 
 \begin{center}
   \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
@@ -304,18 +389,19 @@ right.
     \hline
     Min n(Ranges) & 4 & 4 & 3 & 5 & 4 & 3 & 2 & 2 & 1 & 3 & 3 & 2 & 2 & 1\\
     \hline
-    Next Index    & \textcolor{red}{3} & 2 & 6 & \textcolor{red}{4} & \textcolor{red}{5} & \textcolor{red}{6} & \textcolor{red}{8} & 8 & \textcolor{red}{14} &10 &11 &13 &13 &14\\
+    Next Index    & \textcolor{red}{3} & 2 & \textcolor{red}{6} & 4 & 5 & 6 & \textcolor{red}{8} & 8 & \textcolor{red}{14} &10 &11 &13 &13 &14\\
     \hline
   \end{tabular}\\
   \vspace{0.3cm}
 
   \addtocounter{figure}{1}
+
   \footnotesize{Figure-\arabic{figure}: The numbers in
     \textcolor{red}{red} indicate the range end-points that make up
-    the ranges that cover the entire sequence. If there are \textit{n}
-    numbers, there exist \textit{(n-1)} ranges. Range extension stops
-    when we have gone past the last index in the sequence (14 in this
-    example).}
+    the ranges that cover the entire sequence. If \textit{n} numbers
+    make up the range, then there exist \textit{(n-1)} ranges. Range
+    extension stops when we have gone past the last index in the
+    sequence (14 in this example).}
 
 \end{center}
 
@@ -405,7 +491,7 @@ decompression.
 Every chromosome of the target genome was stripped off any \textit{N}
 characters (unknown base-pair) before compressing it against the
 reference genome's corresponding chromosome. These unknown base-pairs
-mostly occur at the beginning and end of the chromosome.
+mostly occur at the beginning and end of each chromosome.
 
 We ran the experiments on a 32-bit VMWare Player Virtual Machine
 running Ubuntu 11.04, with Windows 7 as the Host Operating
@@ -557,15 +643,15 @@ the results we got for some chromosomes.
     Chromosome & Original (MiB) & Compressed (KiB) & Compression
     Ratio\\
     \hline
-    14 & 83 & 550 & 154.5\\
+    14 & 83 & 554 & 153.4\\
     \hline
-    15 & 73 & 558 & 133.9\\
+    15 & 73 & 562 & 133.0\\
     \hline
-    20 & 57 & 384 & 152.0\\
+    20 & 57 & 387 & 150.8\\
     \hline
-    21 & 32 & 217 & 151.0\\
+    21 & 32 & 219 & 149.6\\
     \hline
-    22 & 32 & 241 & 135.9\\
+    22 & 32 & 243 & 134.8\\
     \hline
   \end{tabular}\\
   \vspace{0.3cm}
@@ -573,6 +659,33 @@ the results we got for some chromosomes.
   \addtocounter{figure}{1}
   \footnotesize{Figure-\arabic{figure}: Compression of certain human
     chromosomes.}
+
+\end{center}
+
+
+When run on \textit{KOREF\_20090131} as the reference genome and
+\textit{KOREF\_20090224} as the target genome, here are the results we
+got for some chromosomes.
+
+\begin{center}
+  \begin{tabular}{|c|p{0.75in}|p{0.9in}|p{1in}|p{1in}|}
+    \hline
+    Chromosome & Compressed (KiB) & Compression
+    Ratio & GRS Compressed (KiB) & GRS Compression Ratio\\
+    \hline
+    17 & 86 & 893.02 & 494.1 & 158.3\\
+    \hline
+    18 & 73 & 1009.97 & 399.0 & 189.4\\
+    \hline
+    22 & 48 & 682.67 & 256.3 & 192.6\\
+    \hline
+  \end{tabular}\\
+  \vspace{0.3cm}
+
+  \addtocounter{figure}{1}
+  \footnotesize{Figure-\arabic{figure}: Comparison of compression
+    achieved by our method v/s that achieved by the \textit{GRS Tool}
+    on certain chromosomes sequenced from Korean individuals.}
 
 \end{center}
 
