@@ -101,12 +101,12 @@ people can be sequenced for a reasonable price.
 Multiple laboratories might use different reference genomes to
 compress the genomes they sequence. For example, a Korean lab might
 want to use a Korean genome as reference since it will be closer to
-the genome of other Koreans. Other laboratores might have their own
+the genome of other Koreans. Other laboratories might have their own
 reference genomes. However, if labs want to share sequenced genomes,
 it becomes hard to share the difference compressed genome if the
 differences have been computed with respect to different reference
 genomes. One option is to decompress the sequenced genome and
-recompress it using the target reference as the reference
+re-compress it using the target reference as the reference
 genome. However, since the compression is a time consuming process, we
 would like to be able to quickly re-encode the genome with reference
 to a difference reference genome.
@@ -137,7 +137,7 @@ We explore the problem of genome compression and see if we can:
 
 \subsection{gzip \& bzip2}
 
-These 2 applications are general lossless compression routines that
+These 2 applications are general loss-less compression routines that
 use run-length encoding and block sort compression respectively. They
 can compress the human genome (about 3GiB) to about 830MiB, which is a
 compression ratio of \textit{3.67}.
@@ -500,7 +500,7 @@ is limited to 4GiB, out of which about 1.5GiB of the higher address
 space is used up by the kernel and dynamically loaded libraries such
 as \textit{glibc}, etc\ldots{}. This leaves us with 2.5GiB to
 use. When constructing the Suffix Array, we have observed that there
-are rarely substrings greater than \textit{65,536} in length that
+are rarely sub-strings greater than \textit{65,536} in length that
 overlap in 2 genomes. This means that we can cap the extra space
 required by the suffix array construction algorithm to $16n \times
 sizeof(int)$. An additional $3n$ space overhead is incurred to store
@@ -527,10 +527,10 @@ time with the process address space that we have.
 
 Experimentally, we determined that we got the best results if we chose
 \textit{16MiB} of data from the reference chromosome \& \textit{6MiB}
-of data from the target chromosome (totalling \textit{22MiB} in
+of data from the target chromosome (totaling \textit{22MiB} in
 all). We had to rune some more experiments to find out the best way to
 align these blocks so that maximum compression for the target could be
-achieved. We found that we occationally need to align each block of
+achieved. We found that we occasionally need to align each block of
 \textit{6MiB} with potentially \textit{2--3} blocks of size
 \textit{16MiB} from the reference to get the best
 compression. Generally \textit{uncompressed plain-text} difference
@@ -545,9 +545,8 @@ sub-optimal compression, but:
   though the machine might have enough physical memory.
 \item Results in faster decompression since the hard disk needle need
   not seek too far (the 16MiB block from which the differences are
-  generated is all that is needed to uncompress a 6MiB block). This
-  makes decompression a very \textit{I/O-efficient} process -- almost
-  making it \textit{cache-oblivious}.
+  generated is all that is needed to decompress a 6MiB block). This
+  makes decompression a very \textit{I/O-efficient} process.
 \end{itemize}
 
 Compressing a \textit{full} target chromosome against another
@@ -607,7 +606,7 @@ offset decompression.
 \begin{center}
   \begin{tabular}{|p{0.6in}|p{0.7in}|p{0.5in}|p{0.8in}|p{0.5in}|p{0.9in}|p{0.9in}|}
     \hline
-    Method & Does Seqence Alignment & Works on FASTA & Human Genome
+    Method & Does Sequence Alignment & Works on FASTA & Human Genome
     Compressed to & Comp. Ratio & Fast Decompression & Random
     Offset Querying\\
     \hline
@@ -673,6 +672,8 @@ got for some chromosomes.
     Chromosome & Compressed (KiB) & Compression
     Ratio & GRS Compressed (KiB) & GRS Compression Ratio\\
     \hline
+    16 & 97 & 918.43 & 554.7 & 158.9\\
+    \hline
     17 & 86 & 893.02 & 494.1 & 158.3\\
     \hline
     18 & 73 & 1009.97 & 399.0 & 189.4\\
@@ -685,7 +686,10 @@ got for some chromosomes.
   \addtocounter{figure}{1}
   \footnotesize{Figure-\arabic{figure}: Comparison of compression
     achieved by our method v/s that achieved by the \textit{GRS Tool}
-    on certain chromosomes sequenced from Korean individuals.}
+    on certain chromosomes sequenced from Korean
+    individuals. Chromosome 16 was NOT stripped off the \textit{N}
+    characters to show that removing these characters doesn't the
+    compression ratio.}
 
 \end{center}
 
@@ -704,7 +708,7 @@ rather than the \textit{sum} of their times.
 
 \section{Acknowledgments}
 
-We would like to thank Dr. Skiena for giving us the opportinity to
+We would like to thank Dr. Skiena for giving us the opportunity to
 work on this project and rightly penalizing us for a less-than-optimal
 project proposal \& progress report. This made us work harder on the
 project. Though, we would like to believe that the real reason for our
