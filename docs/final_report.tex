@@ -164,15 +164,15 @@ DNAzip\cite{dnazip}\cite{genomecompressionchenli} was the first
 algorithm to compress the target genome by storing differences between
 the target and reference genome. However, DNAzip does not solve the
 problem of aligning 2 genomes with each other, but instead assumes the
-existence of an \textit{SNP -- Single Nucleotide Polymorphism} file to
-exist, which it takes in as input. In our experience, aligning 2
+existence of an \textit{SNP -- Single Nucleotide Polymorphism} file,
+which it takes in as input. In our experience, aligning 2
 genomes is a very time consuming process and is orders of magnitude
 slower than performing the actual compression itself.
 
 Wang \& Zhang\cite{wangzhang} have come up with a difference
 compression technique that is able to compress \textit{2986MiB} of a
 Korean genome to \textit{18.8MiB}. This was done by difference
-compressing the target genome it against another Korean genome which
+compressing the target genome against another Korean genome which
 was sequenced using similar methods and had the about the same
 size. their technique considers blocks of bases of size 50, 20 or 10
 million, and groups each chromosome from both the target and the
@@ -688,8 +688,8 @@ got for some chromosomes.
     achieved by our method v/s that achieved by the \textit{GRS Tool}
     on certain chromosomes sequenced from Korean
     individuals. Chromosome 16 was NOT stripped off the \textit{N}
-    characters to show that removing these characters doesn't the
-    compression ratio.}
+    characters to show that removing these characters doesn't impact 
+    the compression ratio.}
 
 \end{center}
 
