@@ -14,7 +14,7 @@
 
 \begin{document}
 
-\title{Compressing the Human Genome against a reference (draft-6)}
+\title{Compressing the Human Genome against a reference}
 \author{Pragya Pande\\\texttt{\small{ppande@cs.stonybrook.edu}}\\\small{Stony Brook University} \and 
   Dhruv Matani\\\texttt{\small{dmatani@cs.stonybrook.edu}}\\\small{Stony Brook University}
 }
@@ -109,7 +109,7 @@ genomes. One option is to decompress the sequenced genome and
 re-compress it using the target reference as the reference
 genome. However, since the compression is a time consuming process, we
 would like to be able to quickly re-encode the genome with reference
-to a difference reference genome.
+to a different reference genome.
 
 We explore the problem of genome compression and see if we can:
 
@@ -181,12 +181,14 @@ may not always work with genomes that have sequenced and assembled
 using different techniques, or if you are using the human genome as a
 reference to compress the mouse genome for example.
 
-Researchers at Virginia Tech, Blacksburg\cite{vtechresearch} have
-also come up with a difference compression algorithm that focuses on
+Researchers at Virginia Tech, Blacksburg\cite{vtechresearch} have also
+come up with a difference compression algorithm that focuses on
 decompression speed rather than raw compression ratio. We are also
 motivated by some of the same factors that have motivated their
 research. The technique presented achieves decompression times of
-$O(\log{n})$ per random offset query. We also target a similar
+$O(\log{n})$ per random offset query\footnote{We haven't yet done a
+  High Probability analysis on the number of disk blocks scanned to
+  resolve a range of a certain length $k$}. We also target a similar
 complexity for random offset queries. They haven't publish exact
 numbers on compressing the human genome, but claim that they achieve
 \textit{98.8\%} compression when compressing mitochondrial sequences,
