@@ -15,4 +15,4 @@ test:
 	tests/driver
 
 clean:
-	rm main tests/driver
+	rm -f main tests/driver text2binary sanitize

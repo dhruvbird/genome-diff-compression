@@ -15,7 +15,7 @@
 \begin{document}
 
 \title{Compressing the Human Genome against a reference}
-\author{Pragya Pande\\\texttt{\small{ppande@cs.stonybrook.edu}}\\\small{Stony Brook University} \and 
+\author{Pragya Pande\\\texttt{\small{prpande@cs.stonybrook.edu}}\\\small{Stony Brook University} \and 
   Dhruv Matani\\\texttt{\small{dmatani@cs.stonybrook.edu}}\\\small{Stony Brook University}
 }
 \date{\today}
@@ -377,8 +377,8 @@ right.
     index $7$, and we want to extend it to compute the solution till
     index $6$, then we scan up to $3$ (the length of the longest range
     at index $6$) places to the right of index $6$ (shown in
-    \textcolor{red}{red}), and locate the smallest value in that range
-    (shown in bold face).}
+    \textcolor{red}{red}), locate the minimum value in that range
+    (shown in bold face), and add $1$ to it.}
 \end{center}
 
 
@@ -606,7 +606,7 @@ offset decompression.
 \subsection{Tabulated Comparison}
 
 \begin{center}
-  \begin{tabular}{|p{0.6in}|p{0.7in}|p{0.5in}|p{0.8in}|p{0.5in}|p{0.9in}|p{0.9in}|}
+  \begin{tabular}{|p{0.6in}|p{0.7in}|p{0.5in}|p{0.8in}|p{0.7in}|p{0.6in}|p{0.9in}|}
     \hline
     Method & Does Sequence Alignment & Works on FASTA & Human Genome
     Compressed to & Comp. Ratio & Fast Decompression & Random
@@ -620,7 +620,7 @@ offset decompression.
     \hline
     Cairo & Yes & Yes & 18.5MiB & 166 & Yes & No\\
     \hline
-    Proposed & Yes & Yes & 22MiB & 139 & Yes & Yes $O(\log{n})$\\
+    Proposed & Yes & Yes & 22-3.3MiB & 139-895 & Yes & Yes $O(\log{n})$\\
     \hline
   \end{tabular}\\
   \vspace{0.3cm}
