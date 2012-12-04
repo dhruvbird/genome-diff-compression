@@ -7,6 +7,23 @@
 
 using namespace std;
 
+void
+write_uint(int x, FILE *pout) {
+    if (x < 128) {
+        uint8_t clen = x;
+        clen |= 128;
+        fwrite(&clen, sizeof(clen), 1, pout);
+    }
+    else if (x < 16384) {
+        uint16_t slen = x;
+        slen |= 16384;
+        fwrite(&slen, sizeof(slen), 1, pout);
+    }
+    else {
+        fwrite(&x, sizeof(x), 1, pout);
+    }
+}
+
 int
 main(int argc, char *argv[]) {
     assert(argc > 1);
@@ -18,6 +35,7 @@ main(int argc, char *argv[]) {
     sprintf(fbuff, tmpl, chr_num, 0);
     FILE *pout = fopen(fbuff, "w");
     assert(pout);
+    int prev_offset = 0;
 
     for (int i = 1; i < 100; ++i) {
         sprintf(fbuff, tmpl, chr_num, i);
@@ -29,20 +47,27 @@ main(int argc, char *argv[]) {
         fscanf(fin, "%d %d %d %d", &code, &doff, &soff, &len);
         while (!feof(fin)) {
             fscanf(fin, "%d %d %d %d", &code, &doff, &soff, &len);
+
+#if 1
             fwrite(&soff, sizeof(soff), 1, pout);
-            if (len < 128) {
-                uint8_t clen = len;
-                clen |= 128;
-                fwrite(&clen, sizeof(clen), 1, pout);
-            }
-            else if (len < 16384) {
-                uint16_t slen = len;
-                len |= 16384;
-                fwrite(&slen, sizeof(slen), 1, pout);
+#else
+            // Difference encode the offsets as well.
+            if (soff < prev_offset) {
+                prev_offset = soff;
+
+                // Set bit number 29 to indicate an absolute value.
+                soff |= 536870912;
             }
             else {
-                fwrite(&len, sizeof(len), 1, pout);
+                int temp = soff;
+                soff -= prev_offset;
+                prev_offset = temp;
             }
+            write_uint(soff, pout);
+#endif
+
+            // Write out the length
+            write_uint(len, pout);
         }
         fclose(fin);
     }

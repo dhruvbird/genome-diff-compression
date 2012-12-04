@@ -1,3 +1,55 @@
+time ./main data/KOREF_20090131/chr16.fa data/KOREF_20090224/chr16.fa 0 0 > out16.1.txt
+time ./main data/KOREF_20090131/chr16.fa data/KOREF_20090224/chr16.fa 2 6 > out16.2.txt
+time ./main data/KOREF_20090131/chr16.fa data/KOREF_20090224/chr16.fa 8 12 > out16.3.txt
+time ./main data/KOREF_20090131/chr16.fa data/KOREF_20090224/chr16.fa 14 18 > out16.4.txt
+time ./main data/KOREF_20090131/chr16.fa data/KOREF_20090224/chr16.fa 20 24 > out16.5.txt
+time ./main data/KOREF_20090131/chr16.fa data/KOREF_20090224/chr16.fa 26 30 > out16.6.txt
+time ./main data/KOREF_20090131/chr16.fa data/KOREF_20090224/chr16.fa 32 36 > out16.7.txt
+time ./main data/KOREF_20090131/chr16.fa data/KOREF_20090224/chr16.fa 38 42 > out16.8.txt
+time ./main data/KOREF_20090131/chr16.fa data/KOREF_20090224/chr16.fa 44 48 > out16.9.txt
+time ./main data/KOREF_20090131/chr16.fa data/KOREF_20090224/chr16.fa 50 54 > out16.10.txt
+time ./main data/KOREF_20090131/chr16.fa data/KOREF_20090224/chr16.fa 56 60 > out16.11.txt
+time ./main data/KOREF_20090131/chr16.fa data/KOREF_20090224/chr16.fa 62 66 > out16.12.txt
+time ./main data/KOREF_20090131/chr16.fa data/KOREF_20090224/chr16.fa 68 72 > out16.13.txt
+time ./main data/KOREF_20090131/chr16.fa data/KOREF_20090224/chr16.fa 71 78 > out16.14.txt
+time ./main data/KOREF_20090131/chr16.fa data/KOREF_20090224/chr16.fa 71 84 > out16.15.txt
+
+# time ./main data/KOREF_20090131/chr17.fa data/KOREF_20090224/chr17.fa 0 0 > out17.1.txt
+# time ./main data/KOREF_20090131/chr17.fa data/KOREF_20090224/chr17.fa 2 6 > out17.2.txt
+# time ./main data/KOREF_20090131/chr17.fa data/KOREF_20090224/chr17.fa 8 12 > out17.3.txt
+# time ./main data/KOREF_20090131/chr17.fa data/KOREF_20090224/chr17.fa 14 18 > out17.4.txt
+# time ./main data/KOREF_20090131/chr17.fa data/KOREF_20090224/chr17.fa 20 24 > out17.5.txt
+# time ./main data/KOREF_20090131/chr17.fa data/KOREF_20090224/chr17.fa 26 30 > out17.6.txt
+# time ./main data/KOREF_20090131/chr17.fa data/KOREF_20090224/chr17.fa 32 36 > out17.7.txt
+# time ./main data/KOREF_20090131/chr17.fa data/KOREF_20090224/chr17.fa 38 42 > out17.8.txt
+# time ./main data/KOREF_20090131/chr17.fa data/KOREF_20090224/chr17.fa 44 48 > out17.9.txt
+# time ./main data/KOREF_20090131/chr17.fa data/KOREF_20090224/chr17.fa 50 54 > out17.10.txt
+# time ./main data/KOREF_20090131/chr17.fa data/KOREF_20090224/chr17.fa 56 60 > out17.11.txt
+# time ./main data/KOREF_20090131/chr17.fa data/KOREF_20090224/chr17.fa 59 66 > out17.12.txt
+# time ./main data/KOREF_20090131/chr17.fa data/KOREF_20090224/chr17.fa 59 72 > out17.13.txt
+
+
+# time ./main data/KOREF_20090131/chr18.fa data/KOREF_20090224/chr18.fa 0 0 > out18.1.txt
+# time ./main data/KOREF_20090131/chr18.fa data/KOREF_20090224/chr18.fa 2 6 > out18.2.txt
+# time ./main data/KOREF_20090131/chr18.fa data/KOREF_20090224/chr18.fa 8 12 > out18.3.txt
+# time ./main data/KOREF_20090131/chr18.fa data/KOREF_20090224/chr18.fa 14 18 > out18.4.txt
+# time ./main data/KOREF_20090131/chr18.fa data/KOREF_20090224/chr18.fa 20 24 > out18.5.txt
+# time ./main data/KOREF_20090131/chr18.fa data/KOREF_20090224/chr18.fa 26 30 > out18.6.txt
+# time ./main data/KOREF_20090131/chr18.fa data/KOREF_20090224/chr18.fa 32 36 > out18.7.txt
+# time ./main data/KOREF_20090131/chr18.fa data/KOREF_20090224/chr18.fa 38 42 > out18.8.txt
+# time ./main data/KOREF_20090131/chr18.fa data/KOREF_20090224/chr18.fa 44 48 > out18.9.txt
+# time ./main data/KOREF_20090131/chr18.fa data/KOREF_20090224/chr18.fa 50 54 > out18.10.txt
+# time ./main data/KOREF_20090131/chr18.fa data/KOREF_20090224/chr18.fa 56 60 > out18.11.txt
+# time ./main data/KOREF_20090131/chr18.fa data/KOREF_20090224/chr18.fa 57 66 > out18.12.txt
+
+
+# time ./main data/KOREF_20090131/chr22.fa data/KOREF_20090224/chr22.fa 0 0 > out22.1.txt
+# time ./main data/KOREF_20090131/chr22.fa data/KOREF_20090224/chr22.fa 2 6 > out22.2.txt
+# time ./main data/KOREF_20090131/chr22.fa data/KOREF_20090224/chr22.fa 8 12 > out22.3.txt
+# time ./main data/KOREF_20090131/chr22.fa data/KOREF_20090224/chr22.fa 14 18 > out22.4.txt
+# time ./main data/KOREF_20090131/chr22.fa data/KOREF_20090224/chr22.fa 19 24 > out22.5.txt
+# time ./main data/KOREF_20090131/chr22.fa data/KOREF_20090224/chr22.fa 19 30 > out22.6.txt
+
 
 # time ./main data/chr14.fa data/HuRef_14.fa 0 0 > out14.1.txt
 # time ./main data/chr14.fa data/HuRef_14.fa 3 6 > out14.2.txt

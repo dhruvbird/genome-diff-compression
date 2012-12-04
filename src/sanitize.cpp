@@ -15,8 +15,8 @@ main(int argc, char *argv[]) {
     while (r) {
         int i = 0, o = 0;
         while (i < r) {
-            if (buff[i] != 'N') {
-                buff[o++] = buff[i++];
+            if (buff[i] != 'N' && buff[i] != 'n') {
+                buff[o++] = toupper(buff[i++]);
             }
             else {
                 ++i;

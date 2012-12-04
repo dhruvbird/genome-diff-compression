@@ -84,8 +84,8 @@ main(int argc, char *argv[]) {
     // std::string ref = "ACCGATCCAGTAGACACGATACCAGATGACAGATATTTACAGTAGATACAGATACAGATGAGAG";
     // std::string tgt = "GATACCATGACATTTTGACACCAGTGACAGATGACACCCAGGAGGTTTAGAGGGCCTCTCTGGGGGCGCGGTAGAGATTT";
 
-    std::string ref = "abcdefghijklmnopqrstuvwxyz pragya pande stony brook university";
-    std::string tgt = "saxena pragya suny sb";
+    std::string ref = "abcdefghijklmnopqrstuvwxyz first name stony brook university";
+    std::string tgt = "last2 first suny sb";
 
     vr_t rout;
     find_best_ranges(ref, tgt, rout);
